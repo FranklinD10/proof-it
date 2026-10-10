@@ -1,0 +1,10 @@
+/target
+lean/.lake/
+.proof-it/runs/
+.proof-it/cache/
+.proof-it/changes/
+examples/**/.proof-it/runs/
+examples/**/.proof-it/cache/
+examples/**/.proof-it/changes/
+benchmarks/**/.proof-it/runs/
+benchmarks/**/.proof-it/cache/

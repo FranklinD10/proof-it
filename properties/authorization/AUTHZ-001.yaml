@@ -1,0 +1,40 @@
+id: AUTHZ-001
+name: User resource isolation
+category: authorization
+severity: critical
+version: 1
+description: An authenticated request can only return a resource looked up by a client-supplied identifier
+  if the resource is owned by the requesting principal (or the principal holds an allowed admin role).
+rationale: Insecure direct object references (IDOR) are the most common critical API vulnerability (OWASP
+  API1).
+languages:
+- typescript
+- javascript
+signals:
+- req\.(params|query|body)
+- (?i)findById|findOne|findUnique|SELECT
+formal:
+  extractor: authz.ownership
+  model: authorization.resource_ownership
+  theorem: user_cannot_access_foreign_resource
+  reference: ProofIt.Authorization.guarded_handler_isolates
+proof_strategy: Compute the path condition under which the handler returns the resource; prove it implies
+  owner = principal ∨ role ∈ adminRoles.
+attack_strategy: Authenticate as user A, request an identifier belonging to user B (adjacent/random IDs).
+testing:
+  fuzz: true
+  mutation: true
+assumptions:
+- Resources loaded by client-supplied id are private to their owner unless suppressed with a reason.
+- The principal identity (e.g. req.user.id) is set by trusted authentication middleware.
+- Lookups that filter by the principal (e.g. WHERE user_id = $principal) return only owned rows (data-layer
+  semantics are assumed, not verified).
+threat_model:
+  actor: authenticated user
+  capabilities:
+  - send HTTP requests
+  - modify path/query/body identifiers
+  - enumerate identifiers
+  goal: read another user's private resource
+recommendation: Compare the resource owner with the authenticated principal before returning it, or scope
+  the query by owner.

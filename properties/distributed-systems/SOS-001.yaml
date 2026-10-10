@@ -1,0 +1,16 @@
+id: SOS-001
+name: An emergency request creates at most one logical emergency
+category: distributed-systems
+severity: critical
+version: 1
+description: Retrying or double-submitting an SOS does not create duplicate active emergencies for the
+  same user.
+rationale: Duplicate emergencies split responder attention.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)\b(sos|emergenc)
+detectors: []
+recommendation: Enforce a unique active emergency per user with a partial unique index and an idempotency
+  key.

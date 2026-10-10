@@ -1,0 +1,46 @@
+# Bundled Semgrep rules. Proof-It never uses the Semgrep registry (network).
+# These complement the built-in TypeScript detectors with interprocedural-free
+# but syntax-aware patterns that are easy to express in Semgrep.
+rules:
+  - id: express-xss-res-send-template
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: Request data interpolated into an HTML response. Encode it or use an auto-escaping template engine.
+    metadata: { cwe: "CWE-79", confidence: MEDIUM, proof_it_property: API-003 }
+    patterns:
+      - pattern-either:
+          - pattern: $RES.send(`...${$REQ.query.$X}...`)
+          - pattern: $RES.send(`...${$REQ.params.$X}...`)
+          - pattern: $RES.send(`...${$REQ.body.$X}...`)
+  - id: hardcoded-jwt-secret
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: JWT signed or verified with a hard-coded string secret. Load the key from configuration.
+    metadata: { cwe: "CWE-798", confidence: HIGH, proof_it_property: AUTH-003 }
+    pattern-either:
+      - pattern: jwt.sign($P, "...", ...)
+      - pattern: jwt.verify($T, "...", ...)
+  - id: sequelize-raw-template
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Template literal passed to sequelize.query. Use replacements or bind parameters.
+    metadata: { cwe: "CWE-89", confidence: MEDIUM, proof_it_property: DB-001 }
+    pattern: $SEQ.query(`...${$X}...`, ...)
+  - id: insecure-cookie-session
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: express-session configured with cookie.secure false.
+    metadata: { cwe: "CWE-614", confidence: HIGH, proof_it_property: SESS-001 }
+    pattern: 'session({..., cookie: {..., secure: false, ...}, ...})'
+  - id: bcrypt-low-cost
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: bcrypt cost factor below 10.
+    metadata: { cwe: "CWE-916", confidence: HIGH, proof_it_property: CRYPTO-001 }
+    patterns:
+      - pattern-either:
+          - pattern: bcrypt.hash($P, $N)
+          - pattern: bcrypt.hashSync($P, $N)
+      - metavariable-comparison:
+          metavariable: $N
+          comparison: $N < 10

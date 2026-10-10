@@ -1,0 +1,16 @@
+id: INFRA-002
+name: No committed private keys or credentials
+category: infrastructure
+severity: critical
+version: 1
+description: Private keys, cloud credentials and connection strings with passwords are not committed.
+rationale: Repository access becomes infrastructure access.
+languages:
+- typescript
+- javascript
+signals:
+- .
+detectors:
+- SECRET-*
+- gitleaks:*
+recommendation: Rotate and remove from history.

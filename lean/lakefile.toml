@@ -1,0 +1,6 @@
+name = "ProofIt"
+version = "0.1.0"
+defaultTargets = ["ProofIt"]
+
+[[lean_lib]]
+name = "ProofIt"

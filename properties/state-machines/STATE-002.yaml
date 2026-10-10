@@ -1,0 +1,26 @@
+id: STATE-002
+name: Forbidden transitions never occur
+category: state-machines
+severity: high
+version: 1
+description: Transitions declared forbidden in the project configuration (e.g. RESOLVED -> ACTIVE) are
+  not possible in the extracted transition relation.
+rationale: Encodes domain rules that the type system cannot express.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)\b(status|state)\b
+formal:
+  extractor: state-machine.forbidden
+  model: state_machine.transition_table
+  theorem: forbidden_transition_impossible
+  reference: ProofIt.StateMachine.unenterable
+proof_strategy: Case analysis over the finite state type.
+attack_strategy: Drive the entity into the forbidden source state and invoke each transition.
+testing:
+  fuzz: true
+  mutation: true
+assumptions:
+- The state field is only written by the extracted code paths.
+recommendation: Remove or guard the transition reported in the counterexample.

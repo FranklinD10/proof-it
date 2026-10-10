@@ -1,0 +1,40 @@
+id: STATE-001
+name: Terminal states are absorbing
+category: state-machines
+severity: high
+version: 1
+description: Once an entity reaches a terminal state (e.g. RESOLVED, CANCELLED), no sequence of transitions
+  in the code moves it to another state.
+rationale: Re-opening closed work items, refunding twice or re-activating resolved emergencies are classic
+  lifecycle bugs.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)\b(status|state|phase|stage)\b
+formal:
+  extractor: state-machine.terminal
+  model: state_machine.transition_table
+  theorem: terminal_has_no_exit
+  reference: ProofIt.StateMachine.terminal_absorbing
+proof_strategy: Extract every write to the state field together with the guard that dominates it, build
+  the transition relation, prove one-step and multi-step absorption by case analysis.
+attack_strategy: Start the entity in each terminal state and call every transition function with every
+  state value.
+testing:
+  fuzz: true
+  mutation: true
+assumptions:
+- The state field is only written by the assignments/updates Proof-It extracted (no reflection, no raw
+  DB writes from other services).
+- Terminal states are those declared in .proof-it/config.yaml; otherwise inferred from names and labelled
+  'inferred'.
+threat_model:
+  actor: authenticated user or buggy client
+  capabilities:
+  - call any transition endpoint
+  - retry requests
+  - send out-of-order requests
+  goal: move a closed entity back into an active state
+recommendation: Guard every write to the state field with an explicit allowed-transitions table and reject
+  transitions out of terminal states.

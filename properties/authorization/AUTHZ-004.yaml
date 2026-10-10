@@ -1,0 +1,24 @@
+id: AUTHZ-004
+name: User cannot modify another user's resource
+category: authorization
+severity: critical
+description: An authenticated request can only modify or delete a resource identified by a client-supplied identifier if the principal owns it (or holds an allowed admin role).
+rationale: Write-side IDOR (OWASP API1 / A01) lets users change other users' accounts, payments or emergencies.
+languages: [typescript, javascript]
+signals: ['req\.(params|query|body)']
+formal:
+  extractor: authz.write
+  model: authorization.resource_ownership
+  theorem: user_cannot_modify_foreign_resource
+  reference: ProofIt.Authorization.guarded_handler_isolates
+proof_strategy: Path condition to every write (save/update/delete) of a resource identified by request data must imply ownership.
+attack_strategy: Authenticate as user A and submit B's identifier to update/delete endpoints.
+testing: { fuzz: true, mutation: true }
+assumptions:
+  - Resources identified by client-supplied ids are private to their owner unless suppressed with a reason.
+  - The principal identity is set by trusted authentication middleware.
+threat_model:
+  actor: authenticated user
+  capabilities: [send HTTP requests, modify identifiers in path/query/body]
+  goal: modify or delete another user's resource
+recommendation: Load the resource, compare its owner with the authenticated principal before writing, or scope the write's WHERE clause by owner.

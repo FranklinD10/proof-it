@@ -1,0 +1,17 @@
+id: INFRA-001
+name: Dependencies have no known vulnerabilities
+category: infrastructure
+severity: high
+version: 1
+description: Locked dependency versions have no advisories in the OSV database.
+rationale: Known-vulnerable dependencies are the cheapest attack path.
+languages:
+- typescript
+- javascript
+signals:
+- .
+detectors:
+- osv:*
+assumptions:
+- Limited to what the OSV database knows at scan time.
+recommendation: Upgrade to a fixed version or document why the advisory does not apply.

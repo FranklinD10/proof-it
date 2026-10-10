@@ -1,0 +1,29 @@
+id: AUTHZ-002
+name: Admin operations require an admin role
+category: authorization
+severity: critical
+version: 1
+description: Handlers mounted under an admin path succeed only on paths that check the principal's role.
+rationale: Missing function-level authorization (OWASP API5) gives every user admin power.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)['\"`]/admin
+formal:
+  extractor: authz.admin
+  model: authorization.role_guard
+  theorem: non_admin_cannot_perform_admin_operation
+proof_strategy: Path-condition analysis as for AUTHZ-001 with conclusion role ∈ adminRoles.
+attack_strategy: Call each admin route as a regular user.
+testing:
+  fuzz: true
+  mutation: true
+assumptions:
+- Middleware whose name mentions 'admin' enforces the admin role (not verified unless analysed).
+threat_model:
+  actor: authenticated non-admin
+  capabilities:
+  - send HTTP requests to admin routes
+  goal: perform an admin-only operation
+recommendation: Check the role in the handler or mount an admin-role middleware on the route.

@@ -1,0 +1,131 @@
+# Ground truth for recall measurement on deliberately vulnerable applications.
+# Each expected item comes from the project's own published vulnerability list.
+# `match` is a rule id or property id; `file` is a path suffix; `kind`:
+#   finding  - a non-formal finding with that rule id in that file
+#   violated - a property result VIOLATED whose target mentions `file`
+# Items Proof-It cannot detect by design are listed with `detectable: false`
+# and a reason, so the measured recall is honest about the denominator.
+apps:
+  - name: NodeGoat
+    url: https://github.com/OWASP/NodeGoat.git
+    commit: c5cb68a
+    expected:
+      - { id: A1-SSJS, desc: "Server-side JS injection (eval of contributions)", kind: finding, match: SEC-CODE-INJECTION, file: app/routes/contributions.js }
+      - { id: A1-NOSQL, desc: "NoSQL injection via $where", kind: finding, match: SEC-NOSQLI, file: app/data/allocations-dao.js }
+      - { id: A1-LOG, desc: "Log injection", kind: finding, match: SEC-LOG-INJECTION, file: app/routes/session.js }
+      - { id: A2-SESSION, desc: "Insecure session cookie configuration", kind: finding, match: SEC-SESSION-DEFAULTS, file: server.js }
+      - { id: A2-BRUTE, desc: "No protection against password guessing", kind: finding, match: SEC-NO-RATE-LIMIT }
+      - { id: A2-POLICY, desc: "Weak password policy", detectable: false, reason: "password complexity rules are a business-logic requirement with no code signal" }
+      - { id: A3-XSS, desc: "Stored/reflected XSS (template auto-escaping disabled)", kind: finding, match: SEC-TEMPLATE-AUTOESCAPE, file: server.js }
+      - { id: A4-IDOR, desc: "Insecure direct object reference /allocations/:userId", kind: violated, match: AUTHZ-001, file: "/allocations/:userId" }
+      - { id: A5-MISCONFIG, desc: "Missing security headers / x-powered-by", kind: finding, match: SEC-NO-SECURITY-HEADERS }
+      - { id: A6-TRANSPORT, desc: "Sensitive data over plain HTTP; PII stored unencrypted", detectable: false, reason: "deployment/transport and data-at-rest encryption are not visible in route code" }
+      - { id: A7-FLAC, desc: "Missing function-level access control on /benefits", detectable: false, reason: "no code signal that /benefits is admin-only (not under an admin path, no role reference); needs a project property" }
+      - { id: A8-CSRF, desc: "Cross-site request forgery", kind: finding, match: SEC-CSRF }
+      - { id: A9-COMPONENTS, desc: "Known-vulnerable dependencies", kind: finding, match: "osv:", network: true }
+      - { id: A10-REDIRECT, desc: "Unvalidated redirect /learn?url=", kind: finding, match: SEC-OPEN-REDIRECT, file: app/routes/index.js }
+      - { id: X-REDOS, desc: "ReDoS in bank routing validation", kind: finding, match: SEC-REDOS, file: app/routes/profile.js }
+      - { id: X-SSRF, desc: "SSRF in research", kind: finding, match: SEC-SSRF, file: app/routes/research.js }
+  - name: DVNA
+    url: https://github.com/appsecco/dvna.git
+    commit: 9ba473a
+    expected:
+      - { id: A1-SQLI, desc: "SQL injection in user search", kind: finding, match: SEC-SQLI, file: core/appHandler.js }
+      - { id: A1-CMDI, desc: "Command injection in ping", kind: finding, match: SEC-CMDI, file: core/appHandler.js }
+      - { id: A2-RESET, desc: "Insecure password reset", detectable: false, reason: "reset-token semantics need a project property (not modeled yet)" }
+      - { id: A3-ADMINAPI, desc: "Sensitive data exposure via /app/admin/usersapi", kind: violated, match: AUTHZ-002, file: /admin/usersapi }
+      - { id: A4-XXE, desc: "XML external entities in bulk product import", kind: finding, match: SEC-XXE, file: core/appHandler.js }
+      - { id: A5-ADMIN, desc: "Missing access control on admin pages", kind: violated, match: AUTHZ-002, file: /admin/users }
+      - { id: A5-IDOR, desc: "Edit another user's profile (useredit)", kind: violated, match: AUTHZ-004, file: /useredit }
+      - { id: A6-MISCONFIG, desc: "Security misconfiguration (headers, stack traces)", kind: finding, match: SEC-NO-SECURITY-HEADERS }
+      - { id: A7-XSS, desc: "Reflected XSS in product search", kind: finding, match: SEC-XSS-TEMPLATE, file: views/app/products.ejs }
+      - { id: A8-DESER, desc: "Insecure deserialization (node-serialize)", kind: finding, match: SEC-DESERIALIZE, file: core/appHandler.js }
+      - { id: A9-COMPONENTS, desc: "Known-vulnerable dependencies", kind: finding, match: "osv:", network: true }
+      - { id: A10-LOGGING, desc: "Insufficient logging and monitoring", detectable: false, reason: "absence of logging is an operational property, not a code pattern" }
+      - { id: X-REDIRECT, desc: "Open redirect", kind: finding, match: SEC-OPEN-REDIRECT, file: core/appHandler.js }
+      - { id: X-CALC, desc: "Code injection through mathjs.eval", kind: finding, match: SEC-CODE-INJECTION, file: core/appHandler.js }
+      - { id: X-SESSION-SECRET, desc: "Hard-coded session secret", kind: finding, match: SEC-HARDCODED-SESSION-SECRET, file: server.js }
+  # Held-out: Proof-It's detectors were NOT tuned on Juice Shop before this list was
+  # written. Baseline before any Juice-Shop-driven change: 9/16 detectable items (56%).
+  - name: JuiceShop
+    url: https://github.com/juice-shop/juice-shop.git
+    commit: 0e6d909
+    held_out: true
+    expected:
+      - { id: SQLI-LOGIN, desc: "SQL injection in login", kind: finding, match: SEC-SQLI, file: routes/login.ts }
+      - { id: SQLI-SEARCH, desc: "SQL injection in product search", kind: finding, match: SEC-SQLI, file: routes/search.ts }
+      - { id: NOSQL-TRACK, desc: "NoSQL $where injection in order tracking", kind: finding, match: SEC-NOSQLI, file: routes/trackOrder.ts }
+      - { id: NOSQL-REVIEWS, desc: "NoSQL $where injection in product reviews", kind: finding, match: SEC-NOSQLI, file: routes/showProductReviews.ts }
+      - { id: NOSQL-UPDATE, desc: "NoSQL injection in review update (forged review)", kind: finding, match: SEC-NOSQLI, file: routes/updateProductReviews.ts }
+      - { id: TRAVERSAL-FTP, desc: "Path traversal / null byte in FTP file server", kind: finding, match: SEC-PATH-TRAVERSAL, file: routes/fileServer.ts }
+      - { id: SSRF-IMAGE, desc: "SSRF in profile image URL upload", kind: finding, match: SEC-SSRF, file: routes/profileImageUrlUpload.ts }
+      - { id: XXE-UPLOAD, desc: "XXE in XML upload", kind: finding, match: SEC-XXE, file: lib/xml.ts }
+      - { id: RCE-B2B, desc: "Code injection in B2B order (vm + notevil)", kind: finding, match: SEC-CODE-INJECTION, file: routes/b2bOrder.ts }
+      - { id: REDIRECT, desc: "Open redirect with bypassable allow-list", kind: finding, match: SEC-OPEN-REDIRECT, file: routes/redirect.ts }
+      - { id: JWT-ALG, desc: "JWT verification without pinned algorithms", kind: finding, match: SEC-JWT-ALG-UNPINNED, file: lib/insecurity.ts }
+      - { id: WEAK-HASH, desc: "MD5 password hashing", kind: finding, match: SEC-WEAK-HASH, file: lib/insecurity.ts }
+      - { id: KEY, desc: "Hard-coded RSA private key", kind: finding, match: SECRET-PRIVATE-KEY, file: lib/insecurity.ts }
+      - { id: ZIPSLIP, desc: "Zip slip in complaint upload", kind: finding, match: SEC-ZIP-SLIP, file: routes/fileUpload.ts }
+      - { id: IDOR-BASKET, desc: "View another user's basket", kind: violated, match: AUTHZ-001, file: /rest/basket/:id }
+      - { id: IDOR-REVIEW, desc: "Edit another user's review", kind: violated, match: AUTHZ-004, file: /rest/products/reviews }
+      - { id: MASS-ROLE, desc: "Register as admin (mass assignment through generated REST API)", detectable: false, reason: "the endpoint is generated at runtime by finale-rest from Sequelize models; no handler code exists" }
+      - { id: RESET-QUESTION, desc: "Weak password reset via security question", detectable: false, reason: "business-logic weakness without a code signal" }
+  # Held-out #2. Ground truth written from the README list BEFORE the first run;
+  # repository-level matching (no file hints) to avoid bias. First-run result is
+  # recorded in docs/validation.md regardless of outcome.
+  - name: DVWS-node
+    url: https://github.com/snoopysecurity/dvws-node.git
+    commit: eb6e288
+    held_out: true
+    expected:
+      - { id: IDOR, desc: "IDOR / horizontal access control", kind: violated, match: AUTHZ-001, any_of: [AUTHZ-004] }
+      - { id: VERTICAL, desc: "Vertical access control", kind: violated, match: AUTHZ-002 }
+      - { id: MASS, desc: "Mass assignment", kind: finding, match: SEC-MASS-ASSIGN }
+      - { id: XSS, desc: "Cross-site scripting", kind: finding, match: SEC-XSS, any_of: [SEC-XSS-TEMPLATE, SEC-TEMPLATE-AUTOESCAPE] }
+      - { id: NOSQLI, desc: "NoSQL injection", kind: finding, match: SEC-NOSQLI }
+      - { id: SSRF, desc: "Server-side request forgery", kind: finding, match: SEC-SSRF }
+      - { id: JWT-SECRET, desc: "JWT secret brute force (weak/hard-coded secret)", kind: finding, match: "semgrep:hardcoded-jwt-secret", any_of: [SECRET-GENERIC, SEC-HARDCODED-SESSION-SECRET, SECRET-JWT] }
+      - { id: INFO, desc: "Information disclosure", kind: finding, match: SEC-ERROR-DISCLOSURE }
+      - { id: CORS, desc: "CORS misconfiguration", kind: finding, match: SEC-CORS }
+      - { id: SQLI, desc: "SQL injection", kind: finding, match: SEC-SQLI }
+      - { id: XXE, desc: "XML external entity injection / XML bomb", kind: finding, match: SEC-XXE }
+      - { id: CMDI, desc: "Command injection", kind: finding, match: SEC-CMDI }
+      - { id: XPATH, desc: "XPath injection", kind: finding, match: SEC-XPATH-INJECTION }
+      - { id: REDIRECT, desc: "Open redirect", kind: finding, match: SEC-OPEN-REDIRECT }
+      - { id: TRAVERSAL, desc: "Path traversal", kind: finding, match: SEC-PATH-TRAVERSAL }
+      - { id: DESER, desc: "Unsafe deserialization", kind: finding, match: SEC-DESERIALIZE }
+      - { id: GQL-AUTHZ, desc: "GraphQL access control", kind: violated, match: AUTHZ-001, any_of: [AUTHZ-002, AUTHZ-004], file: "graphql" }
+      - { id: GQL-INTROSPECTION, desc: "GraphQL introspection enabled", kind: finding, match: SEC-GRAPHQL-INTROSPECTION }
+      - { id: GQL-FILEWRITE, desc: "GraphQL arbitrary file write", kind: finding, match: SEC-PATH-TRAVERSAL, file: "graphql" }
+      - { id: BRUTE, desc: "API endpoint brute forcing / rate limit bypass", kind: finding, match: SEC-NO-RATE-LIMIT }
+      - { id: CRLF, desc: "CRLF injection", kind: finding, match: SEC-HEADER-INJECTION, any_of: [SEC-LOG-INJECTION] }
+      - { id: XMLI, desc: "XML / SOAP injection", kind: finding, match: SEC-XML-INJECTION }
+      - { id: CSRF, desc: "Cross-site request forgery", kind: finding, match: SEC-CSRF }
+      - { id: HIDDEN-API, desc: "Hidden API functionality exposure", detectable: false, reason: "undocumented endpoints are a documentation/inventory property" }
+      - { id: JSON-HIJACK, desc: "JSON hijacking", detectable: false, reason: "legacy browser behaviour; no server code signal" }
+      - { id: XMLRPC-ENUM, desc: "XML-RPC user enumeration", detectable: false, reason: "response-difference enumeration is behavioural, not a code pattern" }
+      - { id: SENSITIVE, desc: "Sensitive data exposure", detectable: false, reason: "which fields are sensitive is a domain decision (API3 excessive data exposure is not analysed yet)" }
+      - { id: GQL-BATCH, desc: "GraphQL batching brute force", detectable: false, reason: "query batching limits are runtime configuration of the GraphQL server" }
+      - { id: CSTI, desc: "Client-side template injection (AngularJS)", detectable: false, reason: "client-side expression evaluation in AngularJS templates is not analysed" }
+  # Third held-out application. Ground truth written from the README and the
+  # exploits/ write-ups only, committed before Proof-It was first run on it.
+  - name: nodejs-goof
+    url: https://github.com/snyk-labs/nodejs-goof.git
+    commit: add14ba
+    held_out: true
+    expected:
+      - { id: REDIRECT, desc: "Open redirect (redirectPage)", kind: finding, match: SEC-OPEN-REDIRECT }
+      - { id: NOSQLI, desc: "NoSQL injection in login (password as object)", kind: finding, match: SEC-NOSQLI }
+      - { id: TEMPLATE-LFI, desc: "Request body passed as template render options (layout → local file inclusion)", kind: finding, match: SEC-SSTI, any_of: [SEC-PATH-TRAVERSAL] }
+      - { id: CMDI, desc: "Shell command injection via image URL", kind: finding, match: SEC-CMDI }
+      - { id: XSS, desc: "XSS via unescaped redirectPage in template", kind: finding, match: SEC-XSS, any_of: [SEC-XSS-TEMPLATE] }
+      - { id: SESSION-SECRET, desc: "Hard-coded session secret", kind: finding, match: SEC-HARDCODED-SESSION-SECRET, any_of: [SECRET-GENERIC] }
+      - { id: COOKIE, desc: "Session cookie without httpOnly", kind: finding, match: SEC-COOKIE-FLAGS, any_of: [SEC-SESSION-DEFAULTS] }
+      - { id: SERVER-INFO, desc: "Security misconfiguration exposes server information", kind: finding, match: SEC-NO-SECURITY-HEADERS }
+      - { id: HTTP, desc: "Insecure protocol (HTTP) communication", kind: finding, match: SEC-INSECURE-TRANSPORT }
+      - { id: PLAINTEXT-PASSWORD, desc: "Passwords stored and compared in plaintext", kind: finding, match: SEC-PLAINTEXT-PASSWORD }
+      - { id: PROTO-POLLUTION, desc: "Prototype pollution in chat (merge of request body)", kind: finding, match: SEC-PROTO-POLLUTION }
+      - { id: ZIPSLIP, desc: "Zip slip in backup upload", kind: finding, match: SEC-ZIP-SLIP }
+      - { id: DEPS, desc: "Known-vulnerable dependencies (mongoose, st, ms, marked, moment, dustjs, typeorm, lodash)", kind: finding, match: "osv:", network: true }
+      - { id: IMAGETRAGICK, desc: "ImageMagick (ImageTragick) in the container image", detectable: false, reason: "system library in the Docker base image; Proof-It does not scan container images" }
+      - { id: VALIDATOR-REDOS, desc: "validator email/rtrim ReDoS", detectable: false, reason: "ReDoS inside a dependency's regular expressions; covered only as a dependency advisory (DEPS)" }

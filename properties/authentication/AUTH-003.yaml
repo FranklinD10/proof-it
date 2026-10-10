@@ -1,0 +1,16 @@
+id: AUTH-003
+name: Token signatures are verified
+category: authentication
+severity: critical
+version: 1
+description: Claims are read only from tokens whose signature was verified with an expected algorithm.
+rationale: jwt.decode() or alg=none accepts forged tokens.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)jsonwebtoken|jwt\.
+detectors:
+- SEC-JWT-DECODE
+- SEC-JWT-ALG-NONE
+recommendation: Use jwt.verify with an explicit algorithms allow-list.

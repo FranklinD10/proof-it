@@ -1,0 +1,15 @@
+id: PAY-002
+name: Failed payments cannot complete
+category: payments
+severity: critical
+version: 1
+description: A payment in FAILED state cannot transition to COMPLETED/PAID.
+rationale: Treating failed payments as paid delivers goods for free.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)payment|charge|invoice
+detectors: []
+recommendation: Declare the payment lifecycle in stateMachines with FAILED -> COMPLETED forbidden (checked
+  by STATE-002).

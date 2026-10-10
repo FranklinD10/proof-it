@@ -1,0 +1,16 @@
+id: DATA-004
+name: No unsafe deserialization or prototype pollution
+category: data-integrity
+severity: high
+version: 1
+description: Untrusted input is not deserialised with code-executing parsers or deep-merged into objects.
+rationale: Leads to remote code execution or privilege escalation.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)unserialize|yaml\.load|merge|Object\.assign
+detectors:
+- SEC-DESERIALIZE
+- SEC-PROTO-POLLUTION
+recommendation: Use safe parsers and allow-listed copying.

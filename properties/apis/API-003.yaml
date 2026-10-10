@@ -1,0 +1,15 @@
+id: API-003
+name: No reflected cross-site scripting
+category: apis
+severity: high
+version: 1
+description: Request data is not written into HTML responses or the DOM without encoding.
+rationale: XSS runs attacker script in the victim's session.
+languages:
+- typescript
+- javascript
+signals:
+- res\.send|innerHTML|dangerouslySetInnerHTML
+detectors:
+- SEC-XSS
+recommendation: Encode output or use a templating engine with auto-escaping.

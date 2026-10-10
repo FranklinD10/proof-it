@@ -1,0 +1,10 @@
+id: API-007
+name: Secure HTTP application configuration
+category: apis
+severity: medium
+description: The HTTP application sets security headers and protects cookie-authenticated state changes against CSRF.
+rationale: OWASP A05 (Security Misconfiguration) and API8; missing headers enable clickjacking/XSS escalation, missing CSRF protection lets other sites act as the user.
+languages: [typescript, javascript]
+signals: ['express\(\)|fastify\(|new Koa|NestFactory']
+detectors: [SEC-NO-SECURITY-HEADERS, SEC-CSRF, SEC-CORS, SEC-SESSION-DEFAULTS]
+recommendation: Use helmet (or edge-proxy headers), SameSite cookies and CSRF tokens for cookie sessions, and an explicit CORS allow-list.

@@ -1,0 +1,16 @@
+id: DB-001
+name: Queries are parameterised
+category: databases
+severity: high
+version: 1
+description: SQL text is never assembled from runtime values.
+rationale: Dynamic SQL is one refactor away from injection.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)select|insert|update|delete|query\(
+detectors:
+- SEC-DYNAMIC-SQL
+- SEC-SQLI
+recommendation: Use placeholders ($1, ?) and pass values separately.

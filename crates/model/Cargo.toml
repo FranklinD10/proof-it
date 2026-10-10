@@ -1,0 +1,20 @@
+[package]
+name = "proof-it-model"
+description = "Formal model IR, evaluator, extractors and Lean integration for Proof-It"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+proof-it-core = { path = "../core" }
+serde.workspace = true
+serde_json.workspace = true
+regex.workspace = true
+
+[dev-dependencies]
+proof-it-lang-ts = { path = "../lang-ts" }
+tempfile.workspace = true
+
+[lints]
+workspace = true

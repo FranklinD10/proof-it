@@ -1,0 +1,15 @@
+id: CONC-001
+name: No check-then-act races on shared records
+category: concurrency
+severity: medium
+version: 1
+description: Read-check-write sequences on persistent records run in a transaction or use conditional
+  updates.
+rationale: Concurrent requests both pass the check (double spend, double booking).
+languages:
+- typescript
+- javascript
+signals:
+- (?i)transaction|findOne|update
+detectors: []
+recommendation: Use conditional UPDATE ... WHERE or SELECT ... FOR UPDATE inside a transaction.

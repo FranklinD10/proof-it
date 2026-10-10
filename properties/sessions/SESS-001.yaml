@@ -1,0 +1,15 @@
+id: SESS-001
+name: Session cookies are protected
+category: sessions
+severity: medium
+version: 1
+description: Session cookies set httpOnly and secure.
+rationale: Script-readable or plaintext cookies are trivially stolen.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)cookie|express-session
+detectors:
+- SEC-COOKIE-FLAGS
+recommendation: 'Set httpOnly: true, secure: true, sameSite.'

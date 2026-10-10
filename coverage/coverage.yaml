@@ -1,0 +1,60 @@
+# Coverage of recognised security catalogues by Proof-It. Each entry states HOW
+# Proof-It establishes evidence:
+#   proven    - formal property (Lean) for the patterns its extractor models
+#   detected  - built-in static/dataflow detectors (pattern evidence, not proof)
+#   external  - delegated to an integrated external tool (osv-scanner, gitleaks, semgrep)
+#   partial   - some sub-classes covered; `gaps` lists the rest
+#   none      - not covered; `why` says why
+# `rules` must exist (checked by tests/coverage.rs).
+catalogues:
+  - name: OWASP Top 10 (2021)
+    items:
+      - { id: A01, title: Broken Access Control, how: proven, rules: [AUTHZ-001, AUTHZ-002, AUTHZ-004, SEC-PATH-TRAVERSAL, SEC-OPEN-REDIRECT, SEC-CORS, SEC-MASS-ASSIGN], gaps: "access rules not expressed in code (business roles beyond admin) need project properties" }
+      - { id: A02, title: Cryptographic Failures, how: detected, rules: [SEC-WEAK-HASH, SEC-PLAINTEXT-PASSWORD, SEC-DEPRECATED-CIPHER, SEC-INSECURE-RANDOM, SEC-TLS-DISABLED, SECRET-PRIVATE-KEY] , gaps: "data-at-rest encryption and transport configuration are deployment properties" }
+      - { id: A03, title: Injection, how: detected, rules: [SEC-SQLI, SEC-DYNAMIC-SQL, SEC-NOSQLI, SEC-CMDI, SEC-CODE-INJECTION, SEC-SSTI, SEC-XSS, SEC-XSS-TEMPLATE, SEC-TEMPLATE-AUTOESCAPE, SEC-LOG-INJECTION, SEC-XPATH-INJECTION, SEC-XML-INJECTION, SEC-HEADER-INJECTION], gaps: "taint is intra-module (two-level interprocedural); cross-module flows rely on Semgrep rules; LDAP injection has no detector" }
+      - { id: A04, title: Insecure Design, how: proven, rules: [STATE-001, STATE-002, PAY-001, PAY-003, AUTHZ-004], gaps: "design flaws without an invariant cannot be detected; declare properties for them" }
+      - { id: A05, title: Security Misconfiguration, how: detected, rules: [SEC-NO-SECURITY-HEADERS, SEC-CSRF, SEC-CORS, SEC-COOKIE-FLAGS, SEC-SESSION-DEFAULTS, SEC-XXE, SEC-ERROR-DISCLOSURE, SEC-GRAPHQL-INTROSPECTION] }
+      - { id: A06, title: Vulnerable and Outdated Components, how: external, rules: ["osv:", SEC-ZIP-SLIP, SEC-PROTO-POLLUTION], gaps: "osv-scanner needs network access; offline, only a small curated table of vulnerable APIs (adm-zip, decompress, tar, lodash merge) is checked for reachability" }
+      - { id: A07, title: Identification and Authentication Failures, how: partial, rules: [SEC-JWT-DECODE, SEC-JWT-ALG-NONE, SEC-JWT-IGNORE-EXPIRATION, SEC-JWT-NO-EXPIRY, SEC-JWT-ALG-UNPINNED, SEC-HARDCODED-SESSION-SECRET, SECRET-GENERIC, SEC-NO-RATE-LIMIT, SEC-SPOOFABLE-CLIENT-IP, SEC-TIMING-COMPARE], gaps: "password policy, MFA and session-fixation logic are not modeled" }
+      - { id: A08, title: Software and Data Integrity Failures, how: partial, rules: [SEC-DESERIALIZE, SEC-PROTO-POLLUTION, SEC-ZIP-SLIP], gaps: "CI/CD and update-channel integrity are out of scope for code analysis" }
+      - { id: A09, title: Security Logging and Monitoring Failures, how: partial, rules: [SEC-LOG-INJECTION, SEC-ERROR-DISCLOSURE, STATIC-EMPTY-CATCH], gaps: "absence of audit logging is an operational property" }
+      - { id: A10, title: Server-Side Request Forgery, how: detected, rules: [SEC-SSRF] }
+  - name: OWASP API Security Top 10 (2023)
+    items:
+      - { id: API1, title: Broken Object Level Authorization, how: proven, rules: [AUTHZ-001, AUTHZ-004], gaps: "GraphQL resolvers are modeled when defined as Query/Mutation resolver maps; schema-first directives and resolver classes other than NestJS are not" }
+      - { id: API2, title: Broken Authentication, how: partial, rules: [SEC-JWT-DECODE, SEC-JWT-ALG-NONE, SEC-JWT-IGNORE-EXPIRATION, SEC-NO-RATE-LIMIT], gaps: "token revocation and credential flows are not modeled" }
+      - { id: API3, title: Broken Object Property Level Authorization, how: detected, rules: [SEC-MASS-ASSIGN], gaps: "excessive data exposure (returning sensitive fields) is not analysed" }
+      - { id: API4, title: Unrestricted Resource Consumption, how: partial, rules: [SEC-REDOS, SEC-REGEX-INJECTION, SEC-NO-RATE-LIMIT], gaps: "pagination limits and payload size limits are not checked" }
+      - { id: API5, title: Broken Function Level Authorization, how: proven, rules: [AUTHZ-002], gaps: "only routes under an /admin path or annotated with @proof-it AUTHZ-002" }
+      - { id: API6, title: Unrestricted Access to Sensitive Business Flows, how: none, why: "business-flow abuse needs domain properties (e.g. SOS-001 idempotency) that are not yet modeled" }
+      - { id: API7, title: Server Side Request Forgery, how: detected, rules: [SEC-SSRF] }
+      - { id: API8, title: Security Misconfiguration, how: detected, rules: [SEC-NO-SECURITY-HEADERS, SEC-CORS, SEC-CSRF, SEC-TLS-DISABLED, SEC-GRAPHQL-INTROSPECTION] }
+      - { id: API9, title: Improper Inventory Management, how: none, why: "API inventory/versioning is an organisational process" }
+      - { id: API10, title: Unsafe Consumption of APIs, how: partial, rules: [SEC-TLS-DISABLED, SEC-SSRF], gaps: "validation of third-party responses is not analysed" }
+  - name: CWE Top 25 (2024)
+    items:
+      - { id: CWE-79, title: Cross-site Scripting, how: detected, rules: [SEC-XSS, SEC-XSS-TEMPLATE, SEC-TEMPLATE-AUTOESCAPE] }
+      - { id: CWE-787, title: Out-of-bounds Write, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-89, title: SQL Injection, how: detected, rules: [SEC-SQLI, SEC-DYNAMIC-SQL] }
+      - { id: CWE-352, title: Cross-Site Request Forgery, how: detected, rules: [SEC-CSRF] }
+      - { id: CWE-22, title: Path Traversal, how: detected, rules: [SEC-PATH-TRAVERSAL, SEC-ZIP-SLIP] }
+      - { id: CWE-125, title: Out-of-bounds Read, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-78, title: OS Command Injection, how: detected, rules: [SEC-CMDI] }
+      - { id: CWE-416, title: Use After Free, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-862, title: Missing Authorization, how: proven, rules: [AUTHZ-001, AUTHZ-002, AUTHZ-004] }
+      - { id: CWE-434, title: Unrestricted File Upload, how: detected, rules: [SEC-UNRESTRICTED-UPLOAD, SEC-ZIP-SLIP] }
+      - { id: CWE-94, title: Code Injection, how: detected, rules: [SEC-CODE-INJECTION, SEC-EVAL, SEC-SSTI] }
+      - { id: CWE-20, title: Improper Input Validation, how: partial, rules: [SEC-NOSQLI, SEC-MASS-ASSIGN], gaps: "general input validation completeness is not decidable statically" }
+      - { id: CWE-77, title: Command Injection, how: detected, rules: [SEC-CMDI] }
+      - { id: CWE-287, title: Improper Authentication, how: partial, rules: [SEC-JWT-DECODE, SEC-JWT-ALG-NONE, SEC-JWT-IGNORE-EXPIRATION] }
+      - { id: CWE-269, title: Improper Privilege Management, how: proven, rules: [AUTHZ-002, SEC-MASS-ASSIGN] }
+      - { id: CWE-502, title: Deserialization of Untrusted Data, how: detected, rules: [SEC-DESERIALIZE] }
+      - { id: CWE-200, title: Exposure of Sensitive Information, how: partial, rules: [AUTHZ-001, SEC-ERROR-DISCLOSURE, SECRET-GENERIC, SEC-COMMITTED-PERSONAL-DATA] }
+      - { id: CWE-863, title: Incorrect Authorization, how: proven, rules: [AUTHZ-001, AUTHZ-004] }
+      - { id: CWE-918, title: Server-Side Request Forgery, how: detected, rules: [SEC-SSRF] }
+      - { id: CWE-119, title: Memory Buffer Errors, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-476, title: NULL Pointer Dereference, how: none, why: "not analysed (TypeScript strict null checks are the right tool)" }
+      - { id: CWE-798, title: Hard-coded Credentials, how: detected, rules: [SECRET-GENERIC, SECRET-PRIVATE-KEY, SEC-HARDCODED-SESSION-SECRET, "gitleaks:"] }
+      - { id: CWE-190, title: Integer Overflow, how: partial, rules: [PAY-001, PAY-003], gaps: "ledger arithmetic is proven over unbounded integers; JS number precision is attacked, not proven" }
+      - { id: CWE-400, title: Uncontrolled Resource Consumption, how: partial, rules: [SEC-REDOS, SEC-NO-RATE-LIMIT] }
+      - { id: CWE-306, title: Missing Authentication for Critical Function, how: partial, rules: [AUTHZ-002], gaps: "unauthenticated routes are reported only when they handle admin paths" }

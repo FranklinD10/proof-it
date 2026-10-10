@@ -1,0 +1,7 @@
+version: 1
+state_machines:
+  - type: OrderStatus
+    initial: PENDING
+    terminal: [SHIPPED, CANCELLED]
+    forbidden:
+      - [SHIPPED, PENDING]

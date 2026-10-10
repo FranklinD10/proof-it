@@ -1,0 +1,10 @@
+id: AUTH-005
+name: Authentication endpoints resist brute force
+category: authentication
+severity: medium
+description: Login, OTP and password-reset endpoints are rate-limited per account and per client.
+rationale: OWASP A07 (Identification and Authentication Failures); credential stuffing and OTP guessing need volume.
+languages: [typescript, javascript]
+signals: ['login|signin|otp|password|reset|verify']
+detectors: [SEC-NO-RATE-LIMIT]
+recommendation: Rate-limit authentication routes (e.g. express-rate-limit) or document the edge limiter.

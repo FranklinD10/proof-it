@@ -1,0 +1,47 @@
+# Each case: the property/rule and the status or finding Proof-It must produce.
+cases:
+  - { dir: authz/idor-good, property: AUTHZ-001, status: PROVEN }
+  - { dir: authz/idor-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/idor-scoped-good, property: AUTHZ-001, status: PROVEN }
+  - { dir: authz/idor-missing-return-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/idor-projection-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/tenant-good, property: AUTHZ-001, status: PROVEN }
+  - { dir: authz/try-wrapped-good, property: AUTHZ-001, status: PROVEN }
+  - { dir: authz/try-throw-swallowed-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/admin-good, property: AUTHZ-002, status: PROVEN }
+  - { dir: authz/admin-bad, property: AUTHZ-002, status: VIOLATED }
+  - { dir: payments/transfer-good, property: PAY-001, status: PROVEN }
+  - { dir: payments/transfer-good, property: PAY-003, status: PROVEN }
+  - { dir: payments/transfer-overdraft-bad, property: PAY-003, status: VIOLATED }
+  - { dir: payments/transfer-fee-leak-bad, property: PAY-001, status: VIOLATED }
+  - { dir: payments/transfer-float-unproven, property: PAY-001, status: UNPROVEN }
+  - { dir: state-machines/table-good, property: STATE-001, target: "OrderStatus:SHIPPED", status: PROVEN }
+  - { dir: state-machines/table-good, property: STATE-001, target: "OrderStatus:CANCELLED", status: PROVEN }
+  - { dir: state-machines/reopen-bad, property: STATE-001, target: "OrderStatus:CANCELLED", status: VIOLATED }
+  - { dir: state-machines/opaque-guard-unproven, property: STATE-001, target: "OrderStatus:CANCELLED", status: UNPROVEN }
+  - { dir: security/sqli-bad, finding: SEC-SQLI }
+  - { dir: security/sqli-good, no_finding: SEC-SQLI }
+  - { dir: security/cmdi-bad, finding: SEC-CMDI }
+  - { dir: security/ssrf-bad, finding: SEC-SSRF }
+  - { dir: security/path-traversal-bad, finding: SEC-PATH-TRAVERSAL }
+  - { dir: security/jwt-expiry-bad, finding: SEC-JWT-IGNORE-EXPIRATION }
+  - { dir: security/secret-bad, finding: SECRET-STRIPE-KEY }
+  - { dir: state-machines/table-good, property: STATE-002, target: "OrderStatus:SHIPPED->PENDING", status: PROVEN }
+  - { dir: authz/validation-and-owner-good, property: AUTHZ-001, status: PROVEN }
+  - { dir: authz/role-list-good, property: AUTHZ-002, status: PROVEN }
+  - { dir: authz/write-idor-bad, property: AUTHZ-004, status: VIOLATED }
+  - { dir: authz/write-idor-good, property: AUTHZ-004, status: PROVEN }
+  - { dir: authz/factory-idor-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/trusted-middleware-good, property: AUTHZ-001, status: PROVEN }
+  - { dir: authz/header-identity-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/route-chain-trailing-guard-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/route-chain-good, property: AUTHZ-001, status: PROVEN }
+  - { dir: authz/graphql-resolver-idor-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/graphql-resolver-scoped-good, property: AUTHZ-001, status: PROVEN }
+  # Anti-gaming: guards and sanitizers are judged by their code, never their names.
+  - { dir: authz/noop-admin-guard-bad, property: AUTHZ-002, status: VIOLATED }
+  - { dir: authz/noop-ownership-guard-bad, property: AUTHZ-001, status: VIOLATED }
+  - { dir: authz/real-admin-guard-good, property: AUTHZ-002, status: PROVEN }
+  - { dir: authz/unseen-admin-guard-unproven, property: AUTHZ-002, status: UNPROVEN }
+  - { dir: security/noop-sanitizer-bad, finding: SEC-SQLI }
+  - { dir: authz/assumed-admin-guard-unproven, property: AUTHZ-002, status: UNPROVEN }

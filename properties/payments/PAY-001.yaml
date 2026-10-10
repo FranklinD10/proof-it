@@ -1,0 +1,36 @@
+id: PAY-001
+name: Transfers conserve money
+category: payments
+severity: critical
+version: 1
+description: A function that moves value between accounts leaves the sum of balances unchanged.
+rationale: Creating or destroying money is a direct financial loss.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)balance|wallet|funds|credits
+formal:
+  extractor: ledger.conservation
+  model: ledger.transfer
+  theorem: money_is_conserved
+  reference: ProofIt.Ledger.transfer_conserves
+proof_strategy: Symbolically execute the balance updates over unbounded integers; prove the sum is invariant
+  with omega.
+attack_strategy: Call the transfer with NaN, Infinity, fractional, negative, zero and huge amounts and
+  the same account twice.
+testing:
+  fuzz: true
+  mutation: true
+assumptions:
+- Balances are mathematical integers in the model; JavaScript number semantics (floating point, NaN) are
+  checked only by the attack engine.
+- The extracted updates are not interleaved with concurrent updates to the same accounts (atomic transaction).
+threat_model:
+  actor: account holder
+  capabilities:
+  - choose transfer amount
+  - choose source and destination
+  - repeat requests
+  goal: increase total funds or overdraw
+recommendation: Debit and credit the same amount inside one transaction.

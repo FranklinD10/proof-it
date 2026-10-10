@@ -1,0 +1,14 @@
+id: MS-002
+name: Retries are idempotent
+category: distributed-systems
+severity: high
+version: 1
+description: Handlers that may be retried (message consumers, POST with retry) do not duplicate effects.
+rationale: At-least-once delivery duplicates side effects such as charges or emergencies.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)retry|idempoten|subscribe|consumer|queue
+detectors: []
+recommendation: Deduplicate with an idempotency key stored atomically with the effect.

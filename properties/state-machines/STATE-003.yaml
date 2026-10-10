@@ -1,0 +1,15 @@
+id: STATE-003
+name: State handling is exhaustive
+category: state-machines
+severity: low
+version: 1
+description: Every switch over a state field handles every declared state or has a default branch.
+rationale: New states added later silently fall through unhandled branches.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)\bswitch\b
+detectors:
+- STATIC-SWITCH-EXHAUSTIVE
+recommendation: Add the missing cases or an explicit default that fails loudly.

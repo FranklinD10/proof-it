@@ -1,0 +1,14 @@
+id: AUTH-001
+name: Unauthenticated users cannot obtain sessions
+category: authentication
+severity: critical
+version: 1
+description: Session or token issuance happens only after successful credential verification.
+rationale: Authentication bypass compromises every downstream property.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)jwt\.sign|createSession|issueToken|login
+detectors: []
+recommendation: Issue tokens only on the success path of credential verification.

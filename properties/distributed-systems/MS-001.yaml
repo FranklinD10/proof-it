@@ -1,0 +1,14 @@
+id: MS-001
+name: Authentication context propagates across services
+category: distributed-systems
+severity: high
+version: 1
+description: Calls between services carry and verify the caller identity.
+rationale: Internal endpoints without auth are reachable via SSRF or a compromised neighbour.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)nats|kafka|amqp|grpc|axios|fetch\(
+detectors: []
+recommendation: Sign or authenticate service-to-service messages.

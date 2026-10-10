@@ -1,0 +1,16 @@
+id: AUTH-002
+name: Expired tokens are rejected
+category: authentication
+severity: high
+version: 1
+description: Token verification enforces expiry; tokens are issued with an expiry.
+rationale: Non-expiring tokens turn any leak into a permanent compromise.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)jsonwebtoken|jwt\.(verify|sign)|jose
+detectors:
+- SEC-JWT-IGNORE-EXPIRATION
+- SEC-JWT-NO-EXPIRY
+recommendation: Never pass ignoreExpiration; always set expiresIn.

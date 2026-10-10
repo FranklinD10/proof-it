@@ -1,0 +1,31 @@
+id: PAY-003
+name: Balances never become negative
+category: payments
+severity: high
+version: 1
+description: Given non-negative balances before the operation, every balance is non-negative after it.
+rationale: Overdrafts allow spending money that does not exist.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)balance|wallet|funds|credits
+formal:
+  extractor: ledger.non-negative
+  model: ledger.transfer
+  theorem: balance_never_negative
+  reference: ProofIt.Ledger.transfer_nonneg
+proof_strategy: Collect dominating guards as hypotheses; prove non-negativity with omega.
+attack_strategy: Amounts equal to, just above, and far above the balance; NaN and negative amounts.
+testing:
+  fuzz: true
+  mutation: true
+assumptions:
+- Balances are non-negative before the operation (inductive invariant).
+- Integer model; floating-point behaviour is covered by attack testing only.
+threat_model:
+  actor: account holder
+  capabilities:
+  - choose the amount
+  goal: overdraw an account
+recommendation: Reject amounts <= 0 and amounts greater than the available balance before debiting.

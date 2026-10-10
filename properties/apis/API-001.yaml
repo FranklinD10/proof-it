@@ -1,0 +1,15 @@
+id: API-001
+name: No server-side request forgery
+category: apis
+severity: high
+version: 1
+description: Request data does not choose the destination of outbound HTTP requests.
+rationale: SSRF reaches cloud metadata and internal services.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)fetch|axios|http\.get|got\(
+detectors:
+- SEC-SSRF
+recommendation: Allow-list destinations; never forward user-supplied URLs.

@@ -1,0 +1,16 @@
+id: CRYPTO-001
+name: No weak hashing for secrets
+category: cryptography
+severity: high
+version: 1
+description: Passwords and secrets are not hashed with MD5/SHA-1 or unsalted fast hashes.
+rationale: Fast hashes are brute-forced offline.
+languages:
+- typescript
+- javascript
+signals:
+- createHash|bcrypt|argon
+detectors:
+- SEC-WEAK-HASH
+- SEC-DEPRECATED-CIPHER
+recommendation: Use argon2id, scrypt or bcrypt for passwords; SHA-256+ for integrity.

@@ -1,0 +1,11 @@
+version: 1
+project:
+  name: demo-emergency-service
+state_machines:
+  - type: EmergencyStatus
+    initial: CREATED
+    terminal: [RESOLVED, CANCELLED]
+    forbidden:
+      - [RESOLVED, ACTIVE]
+testing:
+  allow_execution: false

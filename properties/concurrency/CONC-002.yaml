@@ -1,0 +1,16 @@
+id: CONC-002
+name: Async work is awaited
+category: concurrency
+severity: medium
+version: 1
+description: Promises from async calls in request paths are awaited or explicitly handled.
+rationale: Unawaited writes fail silently and reorder.
+languages:
+- typescript
+- javascript
+signals:
+- \basync\b
+detectors:
+- STATIC-ASYNC-FOREACH
+- STATIC-EMPTY-CATCH
+recommendation: Await the promise or attach explicit error handling.

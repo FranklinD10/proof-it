@@ -1,0 +1,15 @@
+id: AUTHZ-003
+name: No mass assignment of privileged fields
+category: authorization
+severity: high
+version: 1
+description: Request bodies are not passed wholesale into create/update operations.
+rationale: Clients can set role, ownerId or balance fields they should not control.
+languages:
+- typescript
+- javascript
+signals:
+- req\.body
+detectors:
+- SEC-MASS-ASSIGN
+recommendation: Pick allowed fields explicitly (allow-list) before persisting.

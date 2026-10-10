@@ -1,0 +1,21 @@
+[package]
+name = "proof-it-lang-ts"
+description = "TypeScript/JavaScript language adapter for Proof-It (oxc)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+proof-it-core = { path = "../core" }
+oxc.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+regex.workspace = true
+sha2.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

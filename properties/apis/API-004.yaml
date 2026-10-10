@@ -1,0 +1,15 @@
+id: API-004
+name: CORS does not trust arbitrary origins with credentials
+category: apis
+severity: medium
+version: 1
+description: Credentialed CORS is not combined with wildcard or reflected origins.
+rationale: Any website could act as the logged-in user.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)cors
+detectors:
+- SEC-CORS
+recommendation: Use an explicit origin allow-list.

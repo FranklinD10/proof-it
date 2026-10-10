@@ -1,0 +1,14 @@
+id: AUTH-004
+name: Revoked tokens cannot be used
+category: authentication
+severity: high
+version: 1
+description: Token verification consults a revocation list or session store.
+rationale: Logout and credential rotation must take effect.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)revoke|blacklist|denylist|logout
+detectors: []
+recommendation: Check a revocation store or use short-lived tokens with refresh rotation.

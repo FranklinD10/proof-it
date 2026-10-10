@@ -1,0 +1,15 @@
+id: API-002
+name: No open redirects
+category: apis
+severity: medium
+version: 1
+description: Redirect targets are not taken from request data.
+rationale: Open redirects power phishing and OAuth token theft.
+languages:
+- typescript
+- javascript
+signals:
+- redirect
+detectors:
+- SEC-OPEN-REDIRECT
+recommendation: Redirect only to relative paths or an allow-list.

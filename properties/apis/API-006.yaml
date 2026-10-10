@@ -1,0 +1,10 @@
+id: API-006
+name: Errors and logs do not leak or forge information
+category: apis
+severity: low
+description: Internal error details are not returned to clients and request data cannot forge log lines.
+rationale: OWASP A09 (Security Logging and Monitoring Failures); stack traces aid attackers, forged logs mislead responders.
+languages: [typescript, javascript]
+signals: ['catch|console\.|logger\.']
+detectors: [SEC-ERROR-DISCLOSURE, SEC-LOG-INJECTION, STATIC-EMPTY-CATCH]
+recommendation: Return generic errors with a correlation id; use structured logging fields for request data.

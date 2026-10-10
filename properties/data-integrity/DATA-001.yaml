@@ -1,0 +1,19 @@
+id: DATA-001
+name: No injection into interpreters
+category: data-integrity
+severity: critical
+version: 1
+description: Request data does not reach SQL, shell, eval, or NoSQL query sinks without parameterisation.
+rationale: Injection gives attackers the database or the host.
+languages:
+- typescript
+- javascript
+signals:
+- req\.(params|query|body|headers)
+detectors:
+- SEC-SQLI
+- SEC-CMDI
+- SEC-CODE-INJECTION
+- SEC-NOSQLI
+- SEC-DYNAMIC-SQL
+recommendation: Use parameterised queries / argument arrays; never build interpreter input from strings.

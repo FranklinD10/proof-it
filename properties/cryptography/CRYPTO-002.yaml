@@ -1,0 +1,15 @@
+id: CRYPTO-002
+name: Security tokens use a CSPRNG
+category: cryptography
+severity: high
+version: 1
+description: Tokens, OTPs, IDs and secrets are generated with crypto.randomBytes/randomUUID, not Math.random.
+rationale: Math.random output is predictable.
+languages:
+- typescript
+- javascript
+signals:
+- Math\.random
+detectors:
+- SEC-INSECURE-RANDOM
+recommendation: Use crypto.randomBytes, crypto.randomInt or crypto.randomUUID.

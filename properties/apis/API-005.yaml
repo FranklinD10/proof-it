@@ -1,0 +1,10 @@
+id: API-005
+name: No unbounded resource consumption from crafted input
+category: apis
+severity: medium
+description: Request data cannot trigger super-linear work (regular-expression backtracking, user-built regexes, unbounded expansion).
+rationale: OWASP API4 (Unrestricted Resource Consumption); a single request can pin a CPU core.
+languages: [typescript, javascript]
+signals: ['RegExp|/.*\+\)\+|\.test\(|\.match\(']
+detectors: [SEC-REDOS, SEC-REGEX-INJECTION]
+recommendation: Avoid nested quantifiers; escape user input before building regexes; use re2 for untrusted patterns.

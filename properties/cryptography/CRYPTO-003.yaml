@@ -1,0 +1,15 @@
+id: CRYPTO-003
+name: TLS certificate validation is enabled
+category: cryptography
+severity: high
+version: 1
+description: TLS clients do not disable certificate validation.
+rationale: Disabling validation enables man-in-the-middle attacks.
+languages:
+- typescript
+- javascript
+signals:
+- rejectUnauthorized|NODE_TLS_REJECT_UNAUTHORIZED
+detectors:
+- SEC-TLS-DISABLED
+recommendation: 'Remove rejectUnauthorized: false; trust a specific CA instead.'

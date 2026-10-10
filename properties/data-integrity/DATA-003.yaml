@@ -1,0 +1,15 @@
+id: DATA-003
+name: No path traversal
+category: data-integrity
+severity: high
+version: 1
+description: Request data does not select filesystem paths without normalisation and containment.
+rationale: ../ sequences read or overwrite arbitrary files.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)\bfs\b|sendFile|download
+detectors:
+- SEC-PATH-TRAVERSAL
+recommendation: Resolve against a base directory and verify containment, or map ids to paths server-side.

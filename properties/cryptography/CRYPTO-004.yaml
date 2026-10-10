@@ -1,0 +1,15 @@
+id: CRYPTO-004
+name: Secret comparison is constant-time
+category: cryptography
+severity: low
+version: 1
+description: Secrets, signatures and tokens are compared with crypto.timingSafeEqual.
+rationale: Early-exit comparison leaks the secret through timing.
+languages:
+- typescript
+- javascript
+signals:
+- (?i)signature|hmac|secret|token
+detectors:
+- SEC-TIMING-COMPARE
+recommendation: Use crypto.timingSafeEqual on equal-length buffers.

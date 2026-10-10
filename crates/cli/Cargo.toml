@@ -1,0 +1,27 @@
+[package]
+name = "proof-it"
+description = "Proof-It: command-line code assurance"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+proof-it-core = { path = "../core" }
+proof-it-engine = { path = "../engine" }
+proof-it-model = { path = "../model" }
+clap.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+serde.workspace = true
+serde-saphyr.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "proof-it"
+path = "src/main.rs"

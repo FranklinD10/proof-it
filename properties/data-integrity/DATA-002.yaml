@@ -1,0 +1,16 @@
+id: DATA-002
+name: Protected data is not leaked
+category: data-integrity
+severity: critical
+version: 1
+description: Credentials and secrets are not committed to the repository.
+rationale: Leaked credentials are exploited within minutes of publication.
+languages:
+- typescript
+- javascript
+signals:
+- .
+detectors:
+- SECRET-*
+- gitleaks:*
+recommendation: Rotate the credential, remove it from history, load it from a secret manager.
