@@ -57,21 +57,16 @@ change affects, what regressed, whether the verification policy itself was
 weakened, and a merge decision (`AUTO-MERGE ELIGIBLE` / `HUMAN REVIEW
 REQUIRED` / `BLOCKED`) in a machine-readable protocol the agent can act on.
 
-## Used in production at MyWatchman
+## Used at MyWatchman
 
-Proof-It is developed alongside, and used on, [MyWatchman](https://my-watchman.com)'s
-own services (TypeScript and Go microservices). Run read-only against that
-codebase, it found real problems that have since been fixed, including:
+[MyWatchman](https://my-watchman.com) uses Proof-It as one part of the security
+review of its own services. Issues it surfaced there were fixed and verified
+through MyWatchman's normal review and deployment process.
 
-- **SQL injection**: a request parameter reaching a raw database query.
-- **Customer data committed to the repository**: data exports and a migration
-  log, since removed and purged from the repository history.
-
-Using it there also exposed Proof-It's own flaws, which shaped the current
-rules: it once "proved" a role check from a middleware's name alone, and it
-once reported code it had not analysed as passing (see
-[docs/validation.md](docs/validation.md)). It also produced false positives,
-which is why its precision on real code is still listed as unmeasured below.
+Using it on a real production codebase also exposed weaknesses in Proof-It
+itself, which shaped its current rules: it once "proved" a check from a
+function's name alone, and it once reported code it had not analysed as
+passing (see [docs/validation.md](docs/validation.md)).
 
 ## What it cannot do yet
 
