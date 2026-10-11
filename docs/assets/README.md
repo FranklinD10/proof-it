@@ -2,13 +2,18 @@
 
 | File | Use |
 |---|---|
-| `proof-it-logo.png` | **Master** logo (1536×1024, PNG). Edit or replace this one. |
-| `proof-it-logo-768.png` | Web copy shown in the README (768×512, about 260 KB). Generated from the master. |
+| `proof-it-logo.png` | **Master** logo, transparent background (612×408). Shown in the README on light themes. Edit or replace this one. |
+| `proof-it-logo-dark.png` | Dark-theme variant, generated from the master by `make-dark-variant.py` (navy becomes near-white, white glyphs become navy, cyan and green unchanged). |
+| `proof-it-logo-1536-opaque.png` | High-resolution version on a white background (1536×1024), for print or GitHub's social preview. |
 
-To change the logo, replace `proof-it-logo.png` and regenerate the web copy:
+The README picks the right variant for the reader's theme with `<picture>`.
+
+To change the logo, replace `proof-it-logo.png` (ideally a larger transparent
+export: 612 px is enough for the README but soft on high-density screens), then
+regenerate the dark variant:
 
 ```bash
-magick docs/assets/proof-it-logo.png -resize 768x -strip -define png:compression-level=9 docs/assets/proof-it-logo-768.png
+python3 docs/assets/make-dark-variant.py   # requires Pillow
 ```
 
 ## Name and logo
