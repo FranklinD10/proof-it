@@ -8,6 +8,7 @@ rationale: ../ sequences read or overwrite arbitrary files.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - (?i)\bfs\b|sendFile|download
 detectors:

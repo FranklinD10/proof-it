@@ -31,8 +31,9 @@ this change, how do we know it, and what don't we know?*
 
 ## What Proof-It does about it
 
-Proof-It is a command-line tool for TypeScript/JavaScript services that
-answers that question with evidence and refuses to blur the categories:
+Proof-It is a command-line tool for TypeScript, JavaScript and Go services
+(Go: security analysis; formal properties are TypeScript/JavaScript for now)
+that answers that question with evidence and refuses to blur the categories:
 
 | Result | Means |
 |---|---|

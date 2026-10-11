@@ -34,13 +34,13 @@ catalogues:
   - name: CWE Top 25 (2024)
     items:
       - { id: CWE-79, title: Cross-site Scripting, how: detected, rules: [SEC-XSS, SEC-XSS-TEMPLATE, SEC-TEMPLATE-AUTOESCAPE] }
-      - { id: CWE-787, title: Out-of-bounds Write, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-787, title: Out-of-bounds Write, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript or Go (Go's unsafe package is not analysed)" }
       - { id: CWE-89, title: SQL Injection, how: detected, rules: [SEC-SQLI, SEC-DYNAMIC-SQL] }
       - { id: CWE-352, title: Cross-Site Request Forgery, how: detected, rules: [SEC-CSRF] }
       - { id: CWE-22, title: Path Traversal, how: detected, rules: [SEC-PATH-TRAVERSAL, SEC-ZIP-SLIP] }
-      - { id: CWE-125, title: Out-of-bounds Read, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-125, title: Out-of-bounds Read, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript or Go (Go's unsafe package is not analysed)" }
       - { id: CWE-78, title: OS Command Injection, how: detected, rules: [SEC-CMDI] }
-      - { id: CWE-416, title: Use After Free, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-416, title: Use After Free, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript or Go (Go's unsafe package is not analysed)" }
       - { id: CWE-862, title: Missing Authorization, how: proven, rules: [AUTHZ-001, AUTHZ-002, AUTHZ-004] }
       - { id: CWE-434, title: Unrestricted File Upload, how: detected, rules: [SEC-UNRESTRICTED-UPLOAD, SEC-ZIP-SLIP] }
       - { id: CWE-94, title: Code Injection, how: detected, rules: [SEC-CODE-INJECTION, SEC-EVAL, SEC-SSTI] }
@@ -52,7 +52,7 @@ catalogues:
       - { id: CWE-200, title: Exposure of Sensitive Information, how: partial, rules: [AUTHZ-001, SEC-ERROR-DISCLOSURE, SECRET-GENERIC, SEC-COMMITTED-PERSONAL-DATA] }
       - { id: CWE-863, title: Incorrect Authorization, how: proven, rules: [AUTHZ-001, AUTHZ-004] }
       - { id: CWE-918, title: Server-Side Request Forgery, how: detected, rules: [SEC-SSRF] }
-      - { id: CWE-119, title: Memory Buffer Errors, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript" }
+      - { id: CWE-119, title: Memory Buffer Errors, how: none, why: "memory-safety class; not applicable to JavaScript/TypeScript or Go (Go's unsafe package is not analysed)" }
       - { id: CWE-476, title: NULL Pointer Dereference, how: none, why: "not analysed (TypeScript strict null checks are the right tool)" }
       - { id: CWE-798, title: Hard-coded Credentials, how: detected, rules: [SECRET-GENERIC, SECRET-PRIVATE-KEY, SEC-HARDCODED-SESSION-SECRET, "gitleaks:"] }
       - { id: CWE-190, title: Integer Overflow, how: partial, rules: [PAY-001, PAY-003], gaps: "ledger arithmetic is proven over unbounded integers; JS number precision is attacked, not proven" }

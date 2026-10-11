@@ -8,6 +8,7 @@ rationale: Disabling validation enables man-in-the-middle attacks.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - rejectUnauthorized|NODE_TLS_REJECT_UNAUTHORIZED
 detectors:

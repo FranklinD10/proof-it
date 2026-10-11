@@ -8,6 +8,7 @@ rationale: Math.random output is predictable.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - Math\.random
 detectors:

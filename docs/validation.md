@@ -140,7 +140,8 @@ flatters it, and found worse:
   "ASSURANCE: PASSED". Unanalysed source files now make a run INCOMPLETE.
 
 What remains true: detection is mostly patterns over a syntax tree, taint is
-module-local, only TypeScript/JavaScript is supported, and recall on unseen
+module-local, only TypeScript/JavaScript (fully) and Go (security analysis,
+not yet measured on a held-out application) are supported, and recall on unseen
 code is somewhere between 30% and 56% depending on how you count.
 
 ## 5. Self-assurance

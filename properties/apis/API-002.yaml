@@ -8,6 +8,7 @@ rationale: Open redirects power phishing and OAuth token theft.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - redirect
 detectors:

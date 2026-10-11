@@ -8,6 +8,7 @@ rationale: Leaked credentials are exploited within minutes of publication.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - .
 detectors:

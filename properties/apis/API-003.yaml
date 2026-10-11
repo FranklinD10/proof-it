@@ -8,6 +8,7 @@ rationale: XSS runs attacker script in the victim's session.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - res\.send|innerHTML|dangerouslySetInnerHTML
 detectors:
