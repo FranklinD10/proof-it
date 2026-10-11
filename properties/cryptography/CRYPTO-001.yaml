@@ -8,6 +8,7 @@ rationale: Fast hashes are brute-forced offline.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - createHash|bcrypt|argon
 detectors:

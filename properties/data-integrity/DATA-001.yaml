@@ -8,6 +8,7 @@ rationale: Injection gives attackers the database or the host.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - req\.(params|query|body|headers)
 detectors:

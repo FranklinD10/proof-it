@@ -8,6 +8,7 @@ rationale: SSRF reaches cloud metadata and internal services.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - (?i)fetch|axios|http\.get|got\(
 detectors:

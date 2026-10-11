@@ -16,7 +16,7 @@ severity: critical            # info | low | medium | high | critical
 version: 1
 description: …
 rationale: …
-languages: [typescript, javascript]
+languages: [typescript, javascript]   # languages whose checks cover this property (informational)
 signals: ['req\.(params|query|body)']   # applicability regexes; none matching ⇒ NOT_APPLICABLE
 formal:                       # optional: only if an extractor exists
   extractor: authz.ownership  # one of the extractors shipped with Proof-It

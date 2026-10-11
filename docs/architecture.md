@@ -38,6 +38,7 @@ pipeline (crates/engine/src/pipeline.rs)
 |---|---|---|
 | `proof-it-core` | Result types, configuration, property registry, facts IR, process sandbox, evidence store, the Lean-specified decision functions | Trusted code (small, tested, decision logic refined against Lean) |
 | `proof-it-lang-ts` | TypeScript/JavaScript adapter (oxc): facts, security detectors, static checks, mutation operators, transpiler | Untrusted *translation*: its output is labelled as unverified in every proof |
+| `proof-it-lang-go` | Go adapter (tree-sitter-go): functions, type-based request sources, taint, security detectors. No route/handler facts yet, so formal properties do not cover Go | Untrusted analysis; findings carry evidence kinds |
 | `proof-it-model` | Model IR, evaluator, extractors, Lean emitter/runner, formal engine | The Lean kernel is trusted; the emitter is checked by the model self-check |
 | `proof-it-engine` | Orchestration, external tools, attack engine, change assurance, reports | Untrusted analyses; all results carry evidence kinds |
 | `proof-it` (cli) | Command-line interface | — |

@@ -8,6 +8,7 @@ rationale: Dynamic SQL is one refactor away from injection.
 languages:
 - typescript
 - javascript
+- go
 signals:
 - (?i)select|insert|update|delete|query\(
 detectors:
