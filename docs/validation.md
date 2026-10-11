@@ -99,7 +99,7 @@ ground truth, and fired nothing on a private production codebase.
 
 ## 3. Precision on a real codebase
 
-Proof-It has been run read-only (`--safe`) on one private production codebase:
+Proof-It has been run read-only (`--safe`) on MyWatchman's production codebase:
 TypeScript microservices, 444 files, about 4,300 functions, in under a minute.
 Results were checked by hand against the source. That is a spot check, **not
 a precision measurement**:
