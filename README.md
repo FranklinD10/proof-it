@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/proof-it-logo-768.png" alt="Proof-It logo: a shield with a terminal prompt and a check mark" width="320">
+</p>
+
 # Proof-It
 
 > **Status: alpha (v0.1.0-alpha.1).** Useful today as a security scanner with honest
