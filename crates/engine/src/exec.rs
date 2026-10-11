@@ -74,6 +74,9 @@ impl Executor {
         }
         let node = which("node").ok_or_else(|| Error::Environment("node is required to execute JavaScript/TypeScript targets".into()))?;
         let dir = tempfile::Builder::new().prefix("proofit-exec-").tempdir().map_err(|e| Error::io(std::env::temp_dir(), e))?;
+        // Only TypeScript/JavaScript can be executed in the Node sandbox.
+        let files: Vec<_> =
+            files.iter().filter(|f| matches!(f.language, proof_it_core::facts::Language::Typescript | proof_it_core::facts::Language::Javascript)).collect();
         let known: HashSet<String> = files.iter().map(|f| f.path.clone()).collect();
         let mut errors = Vec::new();
         for f in files {

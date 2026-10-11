@@ -62,8 +62,8 @@ Be clear-eyed about these before relying on it:
   production codebase, where it found real issues and also reported design
   choices as violations.
 - **Detection is mostly patterns over a syntax tree**, taint tracking stays
-  within one module (plus local helpers), and only TypeScript/JavaScript is
-  supported.
+  within one module (plus local helpers), and only TypeScript/JavaScript and
+  (security-only) Go are supported.
 - **The code-to-model translation is not verified.** A PROVEN result is only as
   good as the extractor that built the model; every result lists its
   assumptions.
@@ -97,8 +97,14 @@ If you need breadth today, use it **next to** Semgrep or CodeQL, not instead of 
   proven in Lean and refinement-tested; model self-check; mutation testing;
   benchmarks; measured recall on vulnerable applications.
 
-Languages: TypeScript and JavaScript (Express, Koa, Fastify-style routers,
-NestJS, GraphQL resolver maps). Others are on the [roadmap](docs/roadmap.md).
+Languages:
+- **TypeScript and JavaScript** (Express, Koa, Fastify-style routers, NestJS,
+  GraphQL resolver maps): security analysis and formal properties.
+- **Go** (net/http, gin, echo, fiber, chi, gorilla/mux; database/sql, sqlx, pgx,
+  gorm): **security analysis only**, new and not yet measured on a held-out
+  application. Authorization proofs for Go are next.
+- Source files in other languages are reported as **not analysed**, and the run
+  is INCOMPLETE; they are never silently skipped. See the [roadmap](docs/roadmap.md).
 
 ## Install
 

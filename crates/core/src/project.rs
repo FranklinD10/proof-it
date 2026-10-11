@@ -41,6 +41,8 @@ pub struct Project {
     /// Data exports, dumps and database files (any size), checked for committed personal data.
     #[serde(skip)]
     pub data_files: Vec<PathBuf>,
+    /// Source files in a language Proof-It cannot analyse: (path, language).
+    pub unsupported: Vec<(String, String)>,
     pub languages: BTreeMap<String, usize>,
     pub git: Option<GitInfo>,
     pub skipped: Vec<(String, String)>,
@@ -71,8 +73,8 @@ const SKIP_DIRS: [&str; 22] = [
     ".svelte-kit",
 ];
 /// Data exports, dumps and database files.
-pub const DATA_EXTS: [&str; 15] =
-    ["csv", "tsv", "jsonl", "ndjson", "sql", "dump", "bak", "backup", "sqlite", "sqlite3", "db", "xlsx", "xls", "parquet", "json"];
+pub const DATA_EXTS: [&str; 17] =
+    ["csv", "tsv", "jsonl", "ndjson", "sql", "dump", "bak", "backup", "sqlite", "sqlite3", "db", "xlsx", "xls", "parquet", "json", "txt", "log"];
 
 const TEXT_EXTS: [&str; 31] = [
     "json",
@@ -145,6 +147,7 @@ pub fn discover(root: &Path, exclude: &[String], languages: &[String]) -> Result
         files: vec![],
         text_files: vec![],
         data_files: vec![],
+        unsupported: vec![],
         languages: BTreeMap::new(),
         git: read_git_info(root),
         skipped: vec![],
@@ -202,9 +205,13 @@ fn walk(root: &Path, dir: &Path, excludes: &[Regex], wanted: &[String], p: &mut 
             Some(_) if declaration || name.ends_with(".min.js") => {}
             Some(lang) => {
                 *p.languages.entry(lang.name().to_owned()).or_default() += 1;
-                if wanted.iter().any(|w| w == lang.name()) {
+                if !lang.is_supported() {
+                    p.unsupported.push((rel, lang.name().to_owned()));
+                    p.text_files.push(abs);
+                } else if wanted.iter().any(|w| w == lang.name()) {
                     p.files.push(SourceFile { path: rel, abs, language: lang, size });
                 } else {
+                    // Left out by the `languages` setting: an explicit, reported scope choice.
                     p.text_files.push(abs);
                 }
             }

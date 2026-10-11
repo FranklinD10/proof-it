@@ -203,7 +203,7 @@ mod tests {
             ("src/huge.js".to_owned(), "larger than 2097152 bytes".to_owned()),
             ("public/app.min.js".to_owned(), "larger than 2097152 bytes".to_owned()),
         ];
-        let g = crate::pipeline::coverage_gaps(&parse, &skipped);
+        let g = crate::pipeline::coverage_gaps(&parse, &skipped, &[]);
         assert_eq!(g.len(), 2, "{g:?}");
         assert!(g[0].starts_with("src/a.ts") && g[1].starts_with("src/huge.js"));
     }

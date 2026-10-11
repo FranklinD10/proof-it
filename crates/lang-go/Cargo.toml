@@ -1,0 +1,17 @@
+[package]
+name = "proof-it-lang-go"
+description = "Go adapter for Proof-It: facts and security detectors (tree-sitter)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+proof-it-core = { path = "../core" }
+tree-sitter = "0.27"
+tree-sitter-go = "0.25"
+regex.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

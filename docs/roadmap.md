@@ -14,6 +14,13 @@
 - [ ] Per-file recall benchmark from Juice Shop challenge variants; location-based scoring
 - [ ] Measured precision on real codebases
 
+## Go
+
+- [x] Adapter (tree-sitter-go), type-based sources, taint, security detectors, benchmarks
+- [ ] Held-out recall measurement on a deliberately vulnerable Go application
+- [ ] Route and handler facts (net/http, gin, echo, chi) so AUTHZ-001/002/004 apply to Go
+- [ ] Cross-file taint within a package
+
 ## Next
 
 - Cross-module taint (beyond local helpers) and taint into imported functions

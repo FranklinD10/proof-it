@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+- **Go support (security analysis):** a tree-sitter based adapter with
+  type-based request sources (net/http, gin, echo, fiber, chi, gorilla/mux),
+  intra-procedural taint with same-file function summaries, and detectors for
+  SQL injection (database/sql, sqlx, pgx, gorm), command injection, path
+  traversal, SSRF, open redirect, reflected XSS, template injection, disabled
+  TLS verification, weak password hashing and insecure randomness.
+  Authorization, state-machine and ledger models do not cover Go yet, and
+  every run with Go says so.
+- Source files in languages Proof-It cannot analyse are coverage gaps (the
+  run is INCOMPLETE), instead of being silently skipped.
+- The personal-data check also reads `.txt` and `.log` files (a migration log
+  echoing customer records was missed).
+- The detector rule catalogue moved to `proof_it_core::rules`, shared by all
+  language adapters.
+
 ## 0.1.0-alpha.1
 
 First public alpha. Command-line code assurance for TypeScript/JavaScript services.

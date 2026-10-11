@@ -34,6 +34,11 @@ impl Language {
             Self::Rust => "rust",
         }
     }
+    /// Languages Proof-It has an analyser for. Source files in any other
+    /// recognised language are reported as not analysed (never silently skipped).
+    pub fn is_supported(self) -> bool {
+        matches!(self, Self::Typescript | Self::Javascript | Self::Go)
+    }
     pub fn from_extension(ext: &str) -> Option<Self> {
         match ext {
             "ts" | "tsx" | "mts" | "cts" => Some(Self::Typescript),

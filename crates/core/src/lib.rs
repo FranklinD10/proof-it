@@ -12,6 +12,7 @@ pub mod project;
 pub mod property;
 pub mod redact;
 pub mod rng;
+pub mod rules;
 pub mod store;
 pub mod types;
 
