@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="docs/assets/proof-it-logo-768.png" alt="Proof-It logo: a shield with a terminal prompt and a check mark" width="320">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/proof-it-logo-dark.png">
+    <img src="docs/assets/proof-it-logo.png" alt="Proof-It logo: a shield with a terminal prompt and a check mark" width="320">
+  </picture>
 </p>
 
 # Proof-It
