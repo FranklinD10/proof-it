@@ -99,22 +99,18 @@ ground truth, and fired nothing on a private production codebase.
 
 ## 3. Precision on a real codebase
 
-Proof-It has been run read-only (`--safe`) on MyWatchman's production codebase:
-TypeScript microservices, 444 files, about 4,300 functions, in under a minute.
-Results were checked by hand against the source. That is a spot check, **not
-a precision measurement**:
+Proof-It has been run read-only (`--safe`) on a private production codebase of
+TypeScript and Go services. That is a spot check, **not a precision
+measurement**:
 
-- The first runs produced mostly false positives for object-level
-  authorization (pagination parameters treated as identifiers, try/catch
-  checks ignored, router mounts, tenant scoping). Each cause was fixed in
-  general and covered by a benchmark.
-- It found a real, deployed SQL injection (request data reaching a raw query),
-  which was fixed; real object-level authorization gaps; and customer data
-  exports committed to the repository.
-- The current run reports several dozen violations that have **not all been
-  triaged**. Some are design choices (e.g. data scoped by region rather than
-  by role) that need suppressions with reasons. Until they are triaged,
-  Proof-It has no measured false-positive rate on real code.
+- Early runs produced mostly false positives for object-level authorization
+  (pagination parameters treated as identifiers, try/catch checks ignored,
+  router mounts, tenant scoping). Each cause was fixed in general and covered
+  by a benchmark.
+- Its results there have not all been triaged, and some reported violations
+  are deliberate design choices that need suppressions with reasons. Until a
+  full triage is done, Proof-It has **no measured false-positive rate on real
+  code**.
 
 ## 4. Independent measurement and audit (read this before trusting the numbers above)
 
