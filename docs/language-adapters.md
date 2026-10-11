@@ -24,6 +24,40 @@ imports, no execution).
    seeding into local helpers; static checks; mutation operators; an oxc
    transpiler for sandboxed execution.
 
+## Go (`crates/lang-go`, tree-sitter-go) — security only
+
+Purely syntactic, like the TypeScript adapter. Any syntax error (including
+recovered ones) makes the file a coverage gap, so the run is INCOMPLETE.
+
+- **Facts:** functions and methods. Route and handler facts are **not** produced
+  yet, so the authorization models (AUTHZ-*), state machines and ledgers do not
+  apply to Go code; every run containing Go says so in its warnings.
+- **Sources** come from the *declared type* of parameters, never from names:
+  `*http.Request` (`FormValue`, `URL.Query().Get`, `Header.Get`, `PathValue`,
+  `Cookie`, `URL.Path`, `Body` via `io.ReadAll`), `*gin.Context` /
+  `echo.Context` / `*fiber.Ctx` (`Param`, `Query`, `PostForm`, `GetHeader`,
+  `QueryParam`, …, and `ShouldBind*` / `Bind*` / `BodyParser` targets),
+  `json.NewDecoder(r.Body).Decode(&x)`, `json.Unmarshal(tainted, &x)`,
+  `mux.Vars`, `chi.URLParam`.
+- **Propagation:** assignments (`:=`, `=`, `+=`, `var`), `range`, string
+  building (`+`, `fmt.Sprintf`, `strings.*`), conversions, method calls on
+  tainted values, and functions in the same file whose result carries a tainted
+  argument (judged from their bodies; "sanitizers" that return their input
+  unchanged do not clear taint). Sanitizers: `strconv.Atoi`/`Parse*`,
+  `filepath.Base`, `url.*Escape`, `html.EscapeString`, `template.*Escape*`,
+  `uuid.Parse`, bluemonday.
+- **Detectors:** SQL injection and dynamic SQL (database/sql, sqlx, pgx, gorm
+  `Raw`/`Exec`/`Where`/`Order`), command injection (`exec.Command` with a shell
+  or a tainted program), path traversal (`os.*`, `http.ServeFile`, framework
+  file helpers), SSRF (`http.Get`/`NewRequest`/clients), open redirect, reflected
+  XSS (`fmt.Fprintf(w, …)`, `w.Write`, `template.HTML`), template injection,
+  `InsecureSkipVerify: true`, MD5/SHA-1 for passwords, `math/rand` for tokens.
+  Secrets and committed personal data are checked for every file regardless of
+  language.
+- **Not yet:** taint across packages or files, goroutine/channel flows,
+  interface dispatch, struct fields written in one function and read in
+  another, and recall measured on a held-out Go application.
+
 ## Writing an adapter for another language
 
 Produce the same facts. Most of the work is the guarded walker: for each

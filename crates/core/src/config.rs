@@ -127,7 +127,7 @@ impl Default for Config {
         Self {
             version: 1,
             project: ProjectSection::default(),
-            languages: vec!["typescript".into(), "javascript".into()],
+            languages: vec!["typescript".into(), "javascript".into(), "go".into()],
             exclude: vec![],
             analysis: AnalysisSection::default(),
             verification: VerificationSection::default(),
@@ -415,7 +415,7 @@ version: 1
 project:
   name: {name:?}
 
-languages: [typescript, javascript]
+languages: [typescript, javascript, go]
 
 # Extra paths to skip (node_modules, dist, build, .git are always skipped).
 exclude: []

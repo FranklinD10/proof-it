@@ -149,8 +149,11 @@ pub fn analyze_files(project: &Project) -> (ProgramFacts, Vec<Finding>) {
                     let mut out = Vec::new();
                     for f in *chunk {
                         let res = std::fs::read_to_string(&f.abs).map_err(|e| e.to_string()).and_then(|text| {
-                            std::panic::catch_unwind(|| proof_it_lang_ts::analyze(&f.path, &text, known))
-                                .unwrap_or_else(|_| Err("adapter panicked on this file".into()))
+                            std::panic::catch_unwind(|| match f.language {
+                                proof_it_core::facts::Language::Go => proof_it_lang_go::analyze(&f.path, &text),
+                                _ => proof_it_lang_ts::analyze(&f.path, &text, known),
+                            })
+                            .unwrap_or_else(|_| Err("adapter panicked on this file".into()))
                         });
                         out.push((f.path.clone(), res));
                     }
@@ -453,8 +456,18 @@ pub fn run(opts: &Options) -> Result<Report> {
     }
 
     let scoped = opts.diff.is_some() || opts.baseline.is_some();
-    let gaps = coverage_gaps(&facts.parse_errors, &project.skipped);
+    let gaps = coverage_gaps(&facts.parse_errors, &project.skipped, &project.unsupported);
     let mut verdict = verdict::compute(&results, &findings, &stages, &config, scoped, &gaps);
+    // Say what is not modeled for the languages that were analysed.
+    let go_files = facts.modules.iter().filter(|m| m.language == proof_it_core::facts::Language::Go).count();
+    if go_files > 0 {
+        verdict.warnings.push(format!(
+            "Go ({go_files} file(s)): security detectors only — authorization (AUTHZ-*), state-machine and ledger properties are not modeled for Go code yet"
+        ));
+        if verdict.verdict == AssuranceVerdict::Passed {
+            verdict.verdict = AssuranceVerdict::PassedWithWarnings;
+        }
+    }
     if let Some(c) = &change_assessment {
         for g in &c.regressions {
             verdict.reasons.push(format!("REGRESSION {} {}: {} → {}", g.property_id, g.target, g.before, g.after));
@@ -622,7 +635,7 @@ fn write_change_bundle(root: &Path, base: &Path, store: &RunStore, report: &Repo
 
 /// Source files that were not analysed: unparseable, or skipped by size/count limits.
 /// Non-source files skipped (large data files, images) are not gaps.
-pub fn coverage_gaps(parse_errors: &[(String, String)], skipped: &[(String, String)]) -> Vec<String> {
+pub fn coverage_gaps(parse_errors: &[(String, String)], skipped: &[(String, String)], unsupported: &[(String, String)]) -> Vec<String> {
     let source = |f: &str| {
         let ext = std::path::Path::new(f).extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
         proof_it_core::facts::Language::from_extension(&ext).is_some() && !f.ends_with(".min.js") && !f.ends_with(".d.ts")
@@ -631,6 +644,7 @@ pub fn coverage_gaps(parse_errors: &[(String, String)], skipped: &[(String, Stri
         .iter()
         .map(|(f, e)| format!("{f}: could not be parsed ({e})"))
         .chain(skipped.iter().filter(|(f, _)| source(f)).map(|(f, why)| format!("{f}: not analysed ({why})")))
+        .chain(unsupported.iter().map(|(f, lang)| format!("{f}: not analysed ({lang} is not supported by Proof-It yet)")))
         .collect()
 }
 

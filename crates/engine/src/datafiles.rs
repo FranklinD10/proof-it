@@ -171,10 +171,14 @@ mod tests {
             w("backup.dump", b"PGDMP\x01\x0e\x00binary"),
             w("tests/fixtures/users.csv", csv("gmail.com", 25, true).as_bytes()),
             w("package.json", csv("gmail.com", 25, true).as_bytes()),
+            // A migration log that echoes customer records (missed before .txt/.log were checked).
+            w("scripts/migration-log.txt", csv("gmail.com", 25, true).replace(',', " | ").as_bytes()),
+            w("NOTES.txt", "Contact the maintainer at dev@gmail.com.\n".as_bytes()),
         ];
         let f = scan(dir.path(), &files);
         let by: Vec<(&str, Severity)> = f.iter().map(|x| (x.location.as_ref().map_or("", |l| l.file.as_str()), x.severity)).collect();
-        assert_eq!(by.len(), 4, "{by:?}");
+        assert_eq!(by.len(), 5, "{by:?}");
+        assert!(by.contains(&("scripts/migration-log.txt", Severity::High)), "logs echoing customer data");
         assert!(by.contains(&("small_export.csv", Severity::High)), "PII header + real values");
         assert!(by.contains(&("customers.csv", Severity::High)));
         assert!(by.contains(&("backup.dump", Severity::High)));

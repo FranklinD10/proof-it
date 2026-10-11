@@ -45,3 +45,7 @@ cases:
   - { dir: authz/unseen-admin-guard-unproven, property: AUTHZ-002, status: UNPROVEN }
   - { dir: security/noop-sanitizer-bad, finding: SEC-SQLI }
   - { dir: authz/assumed-admin-guard-unproven, property: AUTHZ-002, status: UNPROVEN }
+  # Go
+  - { dir: go/sqli-bad, finding: SEC-SQLI }
+  - { dir: go/sqli-good, no_finding: SEC-SQLI }
+  - { dir: go/cmdi-bad, finding: SEC-CMDI }
