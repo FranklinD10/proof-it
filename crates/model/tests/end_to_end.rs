@@ -52,3 +52,78 @@ fn sample_verdicts() {
         assert!(r.counterexample.as_ref().and_then(|c| c.lean_certificate.as_ref()).is_some(), "{}", r.target);
     }
 }
+
+/// `router.use(auth, adminMiddleware)` with imported middleware: the last
+/// argument is middleware, not a mounted router, and must guard the routes.
+/// Before, it was taken for a router module and the guard was dropped, so a
+/// role-checked admin route was reported VIOLATED.
+#[test]
+fn imported_middleware_in_router_use_guards_routes() {
+    if proof_it_model::lean::runner::toolchain().is_none() {
+        eprintln!("SKIPPED: Lean not installed");
+        return;
+    }
+    let files = [
+        (
+            "src/middleware/admin.ts",
+            r#"
+export const adminMiddleware = (req: any, res: any, next: any) => {
+  if (!req.user) return res.status(401).json({ error: 'auth' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'admin only' });
+  next();
+};
+"#,
+        ),
+        (
+            "src/middleware/auth.ts",
+            r#"
+import jwt from 'jsonwebtoken';
+export const authMiddleware = (req: any, res: any, next: any) => {
+  const token = req.header('Authorization');
+  if (!token) return res.status(401).json({ error: 'no token' });
+  req.user = jwt.verify(token, process.env.JWT_SECRET as string);
+  next();
+};
+"#,
+        ),
+        (
+            "src/routes/admin.ts",
+            r#"
+import { Router } from 'express';
+import { authMiddleware } from '../middleware/auth';
+import { adminMiddleware } from '../middleware/admin';
+const router = Router();
+router.use(authMiddleware, adminMiddleware);
+router.get('/admin/reports', async (req: any, res: any) => {
+  const reports = await db.report.findMany({});
+  res.json(reports);
+});
+export default router;
+"#,
+        ),
+    ];
+    let known: HashSet<String> = files.iter().map(|(p, _)| (*p).to_owned()).collect();
+    let analysed: Vec<_> = files.iter().map(|(p, t)| proof_it_lang_ts::analyze(p, t, &known).expect("parse")).collect();
+    let mount = analysed[2].facts.mounts.first().expect("router.use recorded");
+    assert_eq!(mount.target_module.as_deref(), Some("src/middleware/admin.ts"));
+    assert_eq!(mount.target_text.as_deref(), Some("adminMiddleware"));
+
+    let facts = ProgramFacts {
+        modules: analysed.iter().map(|a| a.facts.clone()).collect(),
+        texts: analysed.iter().map(|a| (a.facts.file.clone(), a.text.clone())).collect(),
+        parse_errors: vec![],
+    };
+    let reg = Registry::load(None).expect("library");
+    let props: Vec<_> = reg.select(&["AUTHZ-002".into()], &[]);
+    let dir = tempfile::tempdir().expect("tmp");
+    let base = evidence_base(dir.path(), None).expect("base");
+    let store = RunStore::create(&base).expect("store");
+    let cfg = Config::default();
+    let org = OrgPolicy::default();
+    let ctx = ExtractContext { facts: &facts, config: &cfg, org: &org };
+    let opts = FormalOptions { seed: 1, search_budget: 200_000, timeout: Duration::from_secs(120), parallel: true, max_proofs: 100, hints_dir: None };
+    let out = run(&props, &ctx, &store, &ProofCache::new(&base, false), &opts);
+    let r = out.results.iter().find(|r| r.target.contains("/admin/reports")).expect("route analysed");
+    eprintln!("{} {} {}", r.status().label(), r.target, r.reason);
+    assert_ne!(r.status(), ProofStatus::Violated, "the role check in adminMiddleware guards the route");
+}

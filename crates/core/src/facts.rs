@@ -532,6 +532,11 @@ pub struct MountFact {
     /// `None` = middleware applied to this module's own routes (all of them when the
     /// prefix is empty, otherwise those whose path starts with the prefix).
     pub target_module: Option<String>,
+    /// Source text of the mounted argument when `target_module` is set. An imported
+    /// name is not necessarily a router: `router.use(auth, adminMiddleware)` mounts
+    /// imported middleware, which the model recognises because that file has no routes.
+    #[serde(default)]
+    pub target_text: Option<String>,
     pub location: SourceLocation,
 }
 

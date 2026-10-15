@@ -542,10 +542,22 @@ pub fn extract(p: &Property, ctx: &ExtractContext<'_>) -> Vec<Extraction> {
     let mut mounted: std::collections::HashMap<&str, Vec<(String, Vec<String>)>> = std::collections::HashMap::new();
     // Same-module path-scoped middleware: `app.use('/rest/basket', mw)` applies to `/rest/basket/...` routes.
     let mut scoped_mw: std::collections::HashMap<&str, Vec<(String, Vec<String>)>> = std::collections::HashMap::new();
+    // Files that define routes: only those can be mounted as routers. An imported
+    // last argument of `use(...)` that defines none is middleware for this module.
+    let routers: std::collections::HashSet<&str> =
+        ctx.facts.modules.iter().filter(|m| !m.routes.is_empty() || !m.route_refs.is_empty()).map(|m| m.file.as_str()).collect();
     for m in &ctx.facts.modules {
         for mt in &m.mounts {
             match &mt.target_module {
-                Some(t) => mounted.entry(t.as_str()).or_default().push((mt.prefix.clone(), mt.middleware.clone())),
+                Some(t) if routers.contains(t.as_str()) || mt.target_text.is_none() => {
+                    mounted.entry(t.as_str()).or_default().push((mt.prefix.clone(), mt.middleware.clone()));
+                }
+                Some(_) => {
+                    let mut mw = mt.middleware.clone();
+                    mw.extend(mt.target_text.clone());
+                    let into = if mt.prefix.is_empty() { &mut mounted } else { &mut scoped_mw };
+                    into.entry(m.file.as_str()).or_default().push((mt.prefix.clone(), mw));
+                }
                 None if mt.prefix.is_empty() => mounted.entry(m.file.as_str()).or_default().push((String::new(), mt.middleware.clone())),
                 None => scoped_mw.entry(m.file.as_str()).or_default().push((mt.prefix.clone(), mt.middleware.clone())),
             }
