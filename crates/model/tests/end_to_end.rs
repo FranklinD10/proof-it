@@ -53,27 +53,16 @@ fn sample_verdicts() {
     }
 }
 
-/// `router.use(auth, adminMiddleware)` with imported middleware: the last
-/// argument is middleware, not a mounted router, and must guard the routes.
-/// Before, it was taken for a router module and the guard was dropped, so a
-/// role-checked admin route was reported VIOLATED.
-#[test]
-fn imported_middleware_in_router_use_guards_routes() {
+/// AUTHZ-002 status of `GET /admin/reports`, served by a router that calls
+/// `router.use(authMiddleware, adminMiddleware)` with `adminMiddleware` imported
+/// from a file whose body is `admin_mw`. `None` when Lean is not installed.
+fn admin_route_status(admin_mw: &str) -> Option<ProofStatus> {
     if proof_it_model::lean::runner::toolchain().is_none() {
         eprintln!("SKIPPED: Lean not installed");
-        return;
+        return None;
     }
     let files = [
-        (
-            "src/middleware/admin.ts",
-            r#"
-export const adminMiddleware = (req: any, res: any, next: any) => {
-  if (!req.user) return res.status(401).json({ error: 'auth' });
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'admin only' });
-  next();
-};
-"#,
-        ),
+        ("src/middleware/admin.ts", admin_mw),
         (
             "src/middleware/auth.ts",
             r#"
@@ -125,5 +114,57 @@ export default router;
     let out = run(&props, &ctx, &store, &ProofCache::new(&base, false), &opts);
     let r = out.results.iter().find(|r| r.target.contains("/admin/reports")).expect("route analysed");
     eprintln!("{} {} {}", r.status().label(), r.target, r.reason);
-    assert_ne!(r.status(), ProofStatus::Violated, "the role check in adminMiddleware guards the route");
+    Some(r.status())
+}
+
+/// `router.use(auth, adminMiddleware)` with imported middleware: the last
+/// argument is middleware, not a mounted router, and must guard the routes.
+/// Before, it was taken for a router module and the guard was dropped, so a
+/// role-checked admin route was reported VIOLATED.
+#[test]
+fn imported_middleware_in_router_use_guards_routes() {
+    let Some(status) = admin_route_status(
+        r#"
+export const adminMiddleware = (req: any, res: any, next: any) => {
+  if (!req.user) return res.status(401).json({ error: 'auth' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'admin only' });
+  next();
+};
+"#,
+    ) else {
+        return;
+    };
+    assert_ne!(status, ProofStatus::Violated, "the role check in adminMiddleware guards the route");
+}
+
+/// Recognising imported middleware must not turn a fake guard into a proof:
+/// a middleware named like an admin guard whose code cannot enforce a role
+/// leaves the admin route VIOLATED.
+#[test]
+fn fake_admin_guards_in_router_use_do_not_protect() {
+    let fakes = [
+        // Does nothing.
+        ("passes everything", "export const adminMiddleware = (req: any, res: any, next: any) => { next(); };"),
+        // Reads the role but never denies.
+        (
+            "reads the role, never denies",
+            "export const adminMiddleware = (req: any, res: any, next: any) => { console.log(req.user.role); next(); };",
+        ),
+        // Denies only unauthenticated requests: any signed-in user passes.
+        (
+            "authentication only",
+            "export const adminMiddleware = (req: any, res: any, next: any) => { if (!req.user) return res.status(401).end(); next(); };",
+        ),
+        // The admin word only in a comment and a log message.
+        (
+            "admin only in comments",
+            "// requires role 'admin'\nexport const adminMiddleware = (req: any, res: any, next: any) => { if (!req.user) return res.status(401).end(); next(); };",
+        ),
+    ];
+    for (what, code) in fakes {
+        let Some(status) = admin_route_status(code) else {
+            return;
+        };
+        assert_eq!(status, ProofStatus::Violated, "fake guard ({what}) must not protect the route");
+    }
 }
