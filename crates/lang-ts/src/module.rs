@@ -85,6 +85,9 @@ pub fn param_names(p: &FormalParameters<'_>) -> Vec<String> {
     p.items.iter().map(|i| i.pattern.get_identifier_name().map_or_else(|| "_".to_owned(), |n| n.as_str().to_owned())).collect()
 }
 
+/// A `use(...)` call: (prefix, middleware, mounted (import binding, source text), location).
+type RawMount = (String, Vec<String>, Option<(String, String)>, proof_it_core::types::SourceLocation);
+
 #[derive(Debug, Clone)]
 struct FnMeta {
     name: String,
@@ -124,7 +127,7 @@ struct Pass1 {
     /// local binding → import specifier
     import_bindings: HashMap<String, String>,
     /// (prefix, middleware, mounted identifier or None for module-wide use, location)
-    mounts: Vec<(String, Vec<String>, Option<String>, proof_it_core::types::SourceLocation)>,
+    mounts: Vec<RawMount>,
     class_stack: Vec<(String, String, Vec<String>)>, // (name, controller prefix, guards)
 }
 
@@ -506,6 +509,7 @@ impl<'a> Visit<'a> for P1<'_, '_> {
                 } else {
                     rest.iter().map(|a| collapse(self.src.slice(a.span()), 80)).collect()
                 };
+                let target = target.map(|t| (t, collapse(self.src.slice(last.span()), 80)));
                 self.st.mounts.push((prefix, mws_all, target, self.src.loc(c.span)));
             }
         }
@@ -1153,7 +1157,8 @@ pub fn analyze_program(program: &Program<'_>, src: &Source<'_>, known_files: &Ha
         .map(|(prefix, mws, target, loc)| MountFact {
             prefix: prefix.clone(),
             middleware: mws.clone(),
-            target_module: target.as_ref().and_then(|t| st.import_bindings.get(t)).and_then(|spec| resolve_import(src.file, spec, known_files)),
+            target_module: target.as_ref().and_then(|(t, _)| st.import_bindings.get(t)).and_then(|spec| resolve_import(src.file, spec, known_files)),
+            target_text: target.as_ref().map(|(_, text)| text.clone()),
             location: loc.clone(),
         })
         .collect();
